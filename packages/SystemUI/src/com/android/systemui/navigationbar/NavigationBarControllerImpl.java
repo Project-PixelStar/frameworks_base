@@ -235,9 +235,16 @@ public class NavigationBarControllerImpl implements
         }
     }
 
-    private boolean shouldCreateNavBarAndTaskBar(int displayId) {
+    private boolean shouldCreateNavBarAndTaskBar(Context context, int displayId) {
         if (mHasNavBar.indexOfKey(displayId) > -1) {
             return mHasNavBar.get(displayId);
+        }
+
+        if (displayId == mDisplayTracker.getDefaultDisplayId() &&
+                Settings.System.getIntForUser(context.getContentResolver(),
+                        Settings.System.NAVIGATION_BAR_SHOW, 0,
+                        UserHandle.USER_CURRENT) == 1) {
+            return true;
         }
 
         final IWindowManager wms = WindowManagerGlobal.getWindowManagerService();
@@ -378,8 +385,11 @@ public class NavigationBarControllerImpl implements
 
         final int displayId = display.getDisplayId();
         final boolean isOnDefaultDisplay = displayId == mDisplayTracker.getDefaultDisplayId();
+        final Context context = isOnDefaultDisplay
+                ? mContext
+                : mContext.createDisplayContext(display);
 
-        if (!shouldCreateNavBarAndTaskBar(displayId)) {
+        if (!shouldCreateNavBarAndTaskBar(context, displayId)) {
             return;
         }
 
@@ -389,12 +399,6 @@ public class NavigationBarControllerImpl implements
             return;
         }
 
-        final Context context = isOnDefaultDisplay
-                ? mContext
-                : mContext.createDisplayContext(display);
-        if (!hasSoftNavigationBar(context, displayId)) {
-            return;
-        }
         NavigationBarComponent component = mNavigationBarComponentFactory.create(
                 context, savedState);
         NavigationBar navBar = component.getNavigationBar();
@@ -418,8 +422,7 @@ public class NavigationBarControllerImpl implements
         });
 
         try {
-            final IWindowManager wms = WindowManagerGlobal.getWindowManagerService();
-            wms.onOverlayChanged();
+            WindowManagerGlobal.getWindowManagerService().onOverlayChanged();
         } catch (RemoteException e) {
             // Do nothing.
         }
@@ -496,23 +499,6 @@ public class NavigationBarControllerImpl implements
             return navBarView.isOverviewEnabled();
         } else {
             return mTaskbarDelegate.isOverviewEnabled();
-        }
-    }
-
-    /**
-     * @param displayId the id of display to check if there is a software navigation bar.
-     *
-     * @return whether there is a soft nav bar on specific display.
-     */
-    private boolean hasSoftNavigationBar(Context context, int displayId) {
-        if (displayId == Display.DEFAULT_DISPLAY && NavbarUtils.isEnabled(context)) {
-            return true;
-        }
-        try {
-            return WindowManagerGlobal.getWindowManagerService().hasNavigationBar(displayId);
-        } catch (RemoteException e) {
-            Log.e(TAG, "Failed to check soft navigation bar", e);
-            return false;
         }
     }
 
