@@ -55,7 +55,7 @@ import com.android.systemui.flags.FeatureFlags;
 import com.android.systemui.flags.FlagsModule;
 import com.android.systemui.keyboard.KeyboardModule;
 import com.android.systemui.keyguard.ui.view.layout.blueprints.KeyguardBlueprintModule;
-import com.android.systemui.awaken.AwakenModule;
+import com.android.systemui.custom.CustomModule;
 import com.android.systemui.log.dagger.LogModule;
 import com.android.systemui.log.dagger.MonitorLog;
 import com.android.systemui.log.table.TableLogBuffer;
@@ -182,7 +182,7 @@ import javax.inject.Named;
             KeyboardModule.class,
             LetterboxModule.class,
             KeyguardBlueprintModule.class,
-            AwakenModule.class,
+            CustomModule.class,
             LogModule.class,
             MediaProjectionModule.class,
             MediaProjectionTaskSwitcherModule.class,
