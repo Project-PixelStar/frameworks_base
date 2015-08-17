@@ -29,7 +29,7 @@ import com.android.systemui.qs.tiles.ReadingModeTile
 import com.android.systemui.qs.tiles.AntiFlickerTile
 import com.android.systemui.qs.tiles.SoundSearchTile
 import com.android.systemui.qs.tiles.CaffeineTile
-
+import com.android.systemui.qs.tiles.VolumeTile
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -80,7 +80,12 @@ interface QSModuleCustom {
     @StringKey(UsbTetherTile.TILE_SPEC)
     fun bindUsbTetherTile(usbTetherTile: UsbTetherTile): QSTileImpl<*>
 
-    /** Inject AODTile into tileMap in QSModule */
+    /** Inject VolumeTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(VolumeTile.TILE_SPEC)
+    fun bindVolumeTile(volumeTile: VolumeTile): QSTileImpl<*>
+        /** Inject AODTile into tileMap in QSModule */
     @Binds
     @IntoMap
     @StringKey(AODTile.TILE_SPEC)
