@@ -128,4 +128,6 @@
     <!-- Device model (Build.MODEL) to spoof for netflix, if not empty -->
     <java-symbol type="string" name="config_netflixSpoofModel" />
 
+    <!-- Whether device has dash charging support -->
+    <bool name="config_hasDashCharger">false</bool>
 </resources>
