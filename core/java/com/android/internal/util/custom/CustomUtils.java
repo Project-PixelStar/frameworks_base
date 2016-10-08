@@ -20,6 +20,7 @@ import android.Manifest;
 import android.app.ActivityManager;
 import android.app.ActivityThread;
 import android.app.AlertDialog;
+import android.net.ConnectivityManager;
 import android.app.IActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -179,5 +180,11 @@ public class CustomUtils {
             }
             return null;
         }
+    }
+    
+    public static boolean isWifiOnly(Context context) {
+        ConnectivityManager cm = (ConnectivityManager)context.getSystemService(
+                Context.CONNECTIVITY_SERVICE);
+        return (cm.isNetworkSupported(ConnectivityManager.TYPE_MOBILE) == false);
     }
 }
