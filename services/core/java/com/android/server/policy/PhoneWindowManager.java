@@ -6371,6 +6371,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         synchronized (mLock) {
             updateWakeGestureListenerLp();
         }
+        sendLidChangeBroadcast();
+    }
+
+    private void sendLidChangeBroadcast() {
+        final int lidState = mDefaultDisplayPolicy.getLidState();
+        Log.d(TAG, "Sending cover change broadcast, lidState=" + lidState);
+        Intent intent = new Intent(com.android.internal.custom.content.Intent.ACTION_LID_STATE_CHANGED);
+        intent.putExtra(com.android.internal.custom.content.Intent.EXTRA_LID_STATE, lidState);
+        intent.setFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
+        mContext.sendBroadcastAsUser(intent, UserHandle.SYSTEM);
     }
 
     void updateUiMode() {
