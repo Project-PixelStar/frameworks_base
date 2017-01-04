@@ -71,6 +71,7 @@ import com.android.systemui.statusbar.phone.StatusIconContainer
 import com.android.systemui.statusbar.phone.StatusOverlayHoverListenerFactory
 import com.android.systemui.statusbar.policy.Clock
 import com.android.systemui.statusbar.policy.ConfigurationController
+import com.android.systemui.statusbar.policy.NetworkTraffic
 import com.android.systemui.statusbar.policy.NextAlarmController
 import com.android.systemui.statusbar.policy.VariableDateView
 import com.android.systemui.statusbar.policy.VariableDateViewController
@@ -144,6 +145,7 @@ constructor(
     private val iconContainer: StatusIconContainer = header.requireViewById(R.id.statusIcons)
     private val mShadeCarrierGroup: ShadeCarrierGroup = header.requireViewById(R.id.carrier_group)
     private val systemIcons: View = header.requireViewById(R.id.shade_header_system_icons)
+    private val networkTraffic: NetworkTraffic = header.findViewById(R.id.networkTraffic)
     private val vibrator: Vibrator = header.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
     private var roundedCorners = 0
@@ -256,6 +258,7 @@ constructor(
                 header.updateAllConstraints(update)
                 privacyChipVisible = visible
                 setBatteryClickable(qsExpandedFraction == 1f || !visible)
+                setNetworkTrafficVisible(qsExpandedFraction == 1f && !privacyChipVisible)
             }
         }
 
@@ -327,6 +330,7 @@ constructor(
         clock.setOnClickListener(this)
         date.setOnClickListener(this)
         setBatteryClickable(true)
+        setNetworkTrafficVisible(false)
     }
 
     override fun onClick(v: View) {
@@ -547,6 +551,7 @@ constructor(
             updateBatteryMode()
         }
         setBatteryClickable(qsExpandedFraction == 1f || !privacyChipVisible)
+        setNetworkTrafficVisible(qsExpandedFraction == 1f && !privacyChipVisible)
     }
 
     private fun logInstantEvent(message: String) {
@@ -617,6 +622,11 @@ constructor(
     private fun setBatteryClickable(clickable: Boolean) {
         batteryIcon.setOnClickListener(if (clickable) this else null)
         batteryIcon.setClickable(clickable)
+    }
+
+    private fun setNetworkTrafficVisible(visible: Boolean) {
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        networkTraffic.setAlpha(if (visible && !isLandscape) 1f else 0f)
     }
 
     override fun dump(pw: PrintWriter, args: Array<out String>) {
