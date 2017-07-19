@@ -45,6 +45,11 @@
 	        android:icon="@drawable/ic_statusbar_cast"
             android:key="cast"
             android:title="@string/quick_settings_cast_title" />
+    
+        <com.android.systemui.tuner.StatusBarSwitch
+            android:icon="@drawable/ic_statusbar_volte"
+            android:key="ims"
+            android:title="@string/status_bar_ims" />
 
         <com.android.systemui.tuner.StatusBarSwitch
             android:icon="@drawable/ic_statusbar_hotspot"
