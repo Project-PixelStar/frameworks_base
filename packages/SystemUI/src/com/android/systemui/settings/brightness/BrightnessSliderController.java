@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 
 import androidx.annotation.Nullable;
@@ -61,6 +62,8 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
     private ToggleSlider mMirror;
     @Nullable
     private MirrorController mMirrorController;
+    private ImageView mIcon;
+    private BrightnessMirrorController mMirrorController;
     private boolean mTracking;
     private final FalsingManager mFalsingManager;
     private final UiEventLogger mUiEventLogger;
@@ -96,6 +99,7 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
         mUiEventLogger = uiEventLogger;
         mBrightnessSliderHapticPlugin = brightnessSliderHapticPlugin;
         mActivityStarter = activityStarter;
+        mIcon = mView.findViewById(R.id.brightness_icon);
     }
 
     /**
@@ -105,6 +109,9 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
         return mView;
     }
 
+    public ImageView getIcon() {
+        return mIcon;
+    }
 
     @Override
     protected void onViewAttached() {
