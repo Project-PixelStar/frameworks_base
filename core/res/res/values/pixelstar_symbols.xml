@@ -144,4 +144,7 @@
 
     <!-- Whether allow to show charging remaining time -->
     <java-symbol type="bool" name="config_show_charging_remaining_time" />
+
+    <!-- Whether the device supports Smart Pixels -->
+    <java-symbol type="bool" name="config_supportSmartPixels" />
 </resources>

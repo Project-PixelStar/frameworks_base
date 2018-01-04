@@ -142,4 +142,7 @@
 
   <!-- Whether allow to show charging remaining time -->
   <bool name="config_show_charging_remaining_time">true</bool>
+
+  <!-- Whether the device supports Smart Pixels -->
+  <bool name="config_supportSmartPixels">true</bool>
 </resources>
