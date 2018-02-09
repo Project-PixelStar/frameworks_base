@@ -16,6 +16,7 @@ import com.android.systemui.qs.tiles.LiveDisplayTile
 import com.android.systemui.qs.tiles.ReadingModeTile
 import com.android.systemui.qs.tiles.AntiFlickerTile
 import com.android.systemui.qs.tiles.RefreshRateTile
+import com.android.systemui.qs.tiles.SoundSearchTile
 
 import dagger.Binds
 import dagger.Module
@@ -114,4 +115,9 @@ interface CustomQSModule {
     @StringKey(RefreshRateTile.TILE_SPEC)
     fun bindRefreshRateTile(refreshRateTile: RefreshRateTile): QSTileImpl<*>
 
+    /** Inject SoundSearchTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(SoundSearchTile.TILE_SPEC)
+    fun bindSoundSearchTile(soundSearchTile: SoundSearchTile): QSTileImpl<*>
 }

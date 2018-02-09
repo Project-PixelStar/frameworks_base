@@ -78,4 +78,7 @@
     <string name="megabytespersecond_short" translatable="false">MB/s</string>
     <string name="gigabytespersecond_short" translatable="false">GB/s</string>
 
+    <!-- SoundSearch Tile -->
+    <string name="quick_settings_sound_search">Sound search</string>
+
 </resources>
