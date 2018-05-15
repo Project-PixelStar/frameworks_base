@@ -7444,5 +7444,11 @@ message MetricsEvent {
     // ---- End Q Constants, all Q constants go above this line ----
     // Add new aosp constants above this line.
     // END OF AOSP CONSTANTS
+
+    // CUSTOM Metrics
+    CUSTOM = 2772;
+    CUSTOM_TILES = 2775;
+    PIXELSTAR = 2999;
+    CUSTOM_CHARGE = 2774;
   }
 }
