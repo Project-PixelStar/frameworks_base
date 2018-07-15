@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.widget.ViewClippingUtil;
+import com.android.systemui.dagger.qualifiers.RootView;
 import com.android.systemui.flags.FeatureFlagsClassic;
 import com.android.systemui.plugins.DarkIconDispatcher;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
@@ -78,6 +79,7 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
     private final HeadsUpManager mHeadsUpManager;
     private final NotificationStackScrollLayoutController mStackScrollerController;
 
+    private final ClockController mClockController;
     private final DarkIconDispatcher mDarkIconDispatcher;
     private final ShadeViewController mShadeViewController;
     private final NotificationRoundnessManager mNotificationRoundnessManager;
@@ -90,7 +92,6 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
     private final CommandQueue mCommandQueue;
     private final NotificationWakeUpCoordinator mWakeUpCoordinator;
 
-    private final View mClockView;
     private final Optional<View> mOperatorNameViewOptional;
 
     @VisibleForTesting
@@ -127,10 +128,10 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
             ShadeViewController shadeViewController,
             NotificationRoundnessManager notificationRoundnessManager,
             HeadsUpStatusBarView headsUpStatusBarView,
-            Clock clockView,
             FeatureFlagsClassic featureFlags,
             HeadsUpNotificationIconInteractor headsUpNotificationIconInteractor,
-            @Named(OPERATOR_NAME_FRAME_VIEW) Optional<View> operatorNameViewOptional) {
+            @Named(OPERATOR_NAME_FRAME_VIEW) Optional<View> operatorNameViewOptional,
+            @RootView PhoneStatusBarView statusBarView) {
         super(headsUpStatusBarView);
         mNotificationIconAreaController = notificationIconAreaController;
         mNotificationRoundnessManager = notificationRoundnessManager;
@@ -150,9 +151,9 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
         mFeatureFlags = featureFlags;
         mHeadsUpNotificationIconInteractor = headsUpNotificationIconInteractor;
         mStackScrollerController.setHeadsUpAppearanceController(this);
-        mClockView = clockView;
         mOperatorNameViewOptional = operatorNameViewOptional;
         mDarkIconDispatcher = darkIconDispatcher;
+        mClockController = new ClockController(statusBarView.getContext(), statusBarView);
 
         mView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -264,15 +265,22 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
 
     private void setShown(boolean isShown) {
         if (mShown != isShown) {
+            View clockView = mClockController.getClock();
+            boolean isClock = clockView != null &&
+                (clockView.getId() == R.id.clock || clockView.getId() == R.id.clock_center);
             mShown = isShown;
             if (isShown) {
                 updateParentClipping(false /* shouldClip */);
                 mView.setVisibility(View.VISIBLE);
                 show(mView);
-                hide(mClockView, View.INVISIBLE);
+                if (isClock) {
+                    hide(clockView, View.INVISIBLE);
+                }
                 mOperatorNameViewOptional.ifPresent(view -> hide(view, View.INVISIBLE));
             } else {
-                show(mClockView);
+                if (isClock) {
+                    show(clockView);
+                }
                 mOperatorNameViewOptional.ifPresent(this::show);
                 hide(mView, View.GONE, () -> {
                     updateParentClipping(true /* shouldClip */);
