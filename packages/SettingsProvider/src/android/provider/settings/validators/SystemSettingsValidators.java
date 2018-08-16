@@ -319,5 +319,6 @@ public class SystemSettingsValidators {
                         return new InclusiveIntegerRangeValidator(0, 1000).validate(item);
                     }
                 });
+        VALIDATORS.put(System.LOCKSCREEN_BATTERY_INFO, BOOLEAN_VALIDATOR);
     }
 }
