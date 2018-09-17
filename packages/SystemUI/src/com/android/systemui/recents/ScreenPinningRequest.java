@@ -16,6 +16,8 @@
 
 package com.android.systemui.recents;
 
+import static android.view.Display.DEFAULT_DISPLAY;
+
 import static com.android.systemui.shared.recents.utilities.Utilities.isLargeScreen;
 import static com.android.systemui.util.leak.RotationUtils.ROTATION_LANDSCAPE;
 import static com.android.systemui.util.leak.RotationUtils.ROTATION_NONE;
@@ -34,6 +36,8 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Binder;
 import android.os.RemoteException;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.text.SpannableStringBuilder;
 import android.text.style.BulletSpan;
 import android.util.DisplayMetrics;
@@ -70,6 +74,8 @@ import dagger.Lazy;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
+
+import com.android.internal.util.custom.NavbarUtils;
 
 @SysUISingleton
 public class ScreenPinningRequest implements
@@ -274,7 +280,8 @@ public class ScreenPinningRequest implements
                     .setLayoutDirection(View.LAYOUT_DIRECTION_LOCALE);
             View buttons = mLayout.findViewById(R.id.screen_pinning_buttons);
             if (!QuickStepContract.isGesturalMode(mNavBarMode)
-            	    && hasSoftNavigationBar(mContext.getDisplayId()) && !isLargeScreen(mContext)) {
+            	    && hasSoftNavigationBar(mContext, mContext.getDisplayId())
+            	    && !isLargeScreen(mContext)) {
                 buttons.setLayoutDirection(View.LAYOUT_DIRECTION_LOCALE);
                 swapChildrenIfRtlAndVertical(buttons);
             } else {
@@ -350,6 +357,26 @@ public class ScreenPinningRequest implements
          * @return whether there is a soft nav bar on specific display.
          */
         private boolean hasSoftNavigationBar(int displayId) {
+            try {
+                return WindowManagerGlobal.getWindowManagerService().hasNavigationBar(displayId);
+            } catch (RemoteException e) {
+                Log.e(TAG, "Failed to check soft navigation bar", e);
+                return false;
+            }
+        }
+
+        /**
+         * @param displayId the id of display to check if there is a software navigation bar.
+         *
+         * @return whether there is a soft nav bar on specific display.
+         */
+        private boolean hasSoftNavigationBar(Context context, int displayId) {
+            if (displayId == DEFAULT_DISPLAY &&
+                    Settings.System.getIntForUser(context.getContentResolver(),
+                            Settings.System.NAVIGATION_BAR_SHOW, 0,
+                            UserHandle.USER_CURRENT) == 1) {
+                return true;
+            }
             try {
                 return WindowManagerGlobal.getWindowManagerService().hasNavigationBar(displayId);
             } catch (RemoteException e) {
