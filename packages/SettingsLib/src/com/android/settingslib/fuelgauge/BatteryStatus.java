@@ -26,6 +26,7 @@ import static android.os.BatteryManager.EXTRA_MAX_CHARGING_VOLTAGE;
 import static android.os.BatteryManager.EXTRA_PLUGGED;
 import static android.os.BatteryManager.EXTRA_PRESENT;
 import static android.os.BatteryManager.EXTRA_STATUS;
+import static android.os.BatteryManager.EXTRA_TEMPERATURE;
 import static android.os.OsProtoEnums.BATTERY_PLUGGED_NONE;
 import static android.os.BatteryManager.EXTRA_OEM_FAST_CHARGER;
 
@@ -57,8 +58,11 @@ public class BatteryStatus {
     public final int level;
     public final int plugged;
     public final int chargingStatus;
-    public final int maxChargingWattage;
     public final boolean oemFastChargeStatus;
+    public final float maxChargingCurrent;
+    public final float maxChargingVoltage;
+    public final float maxChargingWattage;
+    public final float temperature;
     public final boolean present;
     public final Optional<Boolean> incompatibleCharger;
 
@@ -69,14 +73,20 @@ public class BatteryStatus {
     }
 
     public BatteryStatus(int status, int level, int plugged, int chargingStatus,
-            int maxChargingWattage, boolean oemFastChargeStatus, boolean present) {
+            float maxChargingWattage, boolean oemFastChargeStatus,
+            boolean present,
+            float maxChargingCurrent, float maxChargingVoltage,
+            float temperature) {
         this.status = status;
         this.level = level;
         this.plugged = plugged;
         this.chargingStatus = chargingStatus;
+        this.maxChargingCurrent = maxChargingCurrent;
+        this.maxChargingVoltage = maxChargingVoltage;
         this.maxChargingWattage = maxChargingWattage;
         this.oemFastChargeStatus = oemFastChargeStatus;
         this.present = present;
+        this.temperature = temperature;
         this.incompatibleCharger = Optional.empty();
     }
 
@@ -97,9 +107,16 @@ public class BatteryStatus {
                 CHARGING_POLICY_DEFAULT);
         oemFastChargeStatus = batteryChangedIntent.getBooleanExtra(EXTRA_OEM_FAST_CHARGER, false);
         present = batteryChangedIntent.getBooleanExtra(EXTRA_PRESENT, true);
+        temperature = batteryChangedIntent.getIntExtra(EXTRA_TEMPERATURE, -1);
         this.incompatibleCharger = incompatibleCharger;
 
         maxChargingWattage = calculateMaxChargingMicroWatt(batteryChangedIntent);
+        maxChargingCurrent = batteryChangedIntent.getIntExtra(EXTRA_MAX_CHARGING_CURRENT, -1);
+        int maxChargingMicroVolt = batteryChangedIntent.getIntExtra(EXTRA_MAX_CHARGING_VOLTAGE, -1);
+        if (maxChargingMicroVolt <= 0) {
+            maxChargingMicroVolt = DEFAULT_CHARGING_VOLTAGE_MICRO_VOLT;
+        }
+        maxChargingVoltage = maxChargingMicroVolt;
     }
 
     /** Determine whether the device is plugged. */
