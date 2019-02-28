@@ -527,6 +527,19 @@ public class CentralSurfacesCommandQueueCallbacks implements CommandQueue.Callba
             mShadeController.animateCollapseShade();
         } else {
             mShadeController.animateExpandQs();
+
+    public void toggleCameraFlash() {
+        if (mFlashlightController.isAvailable()) {
+            mFlashlightController.setFlashlight(!mFlashlightController.isEnabled());
+        }
+    }
+
+    @Override
+    public void toggleSettingsPanel() {
+        if (mShadeViewController.isPanelExpanded()) {
+            mShadeController.animateCollapseShade();
+        } else {
+            animateExpandSettingsPanel(null);
         }
     }
 
@@ -578,12 +591,5 @@ public class CentralSurfacesCommandQueueCallbacks implements CommandQueue.Callba
         mShadeController.performHapticFeedback(
                 HapticFeedbackConstants.GESTURE_START
         );
-    }
-
-    @Override
-    public void toggleCameraFlash() {
-        if (mFlashlightController.isAvailable()) {
-            mFlashlightController.setFlashlight(!mFlashlightController.isEnabled());
-        }
     }
 }
