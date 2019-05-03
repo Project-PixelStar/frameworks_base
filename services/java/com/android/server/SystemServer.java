@@ -307,6 +307,9 @@ import java.util.concurrent.Future;
 // LineageHardware
 import com.android.server.custom.LineageHardwareService;
 
+// LiveDisplay
+import com.android.server.custom.display.LiveDisplayService;
+
 /**
  * Entry point to {@code system_server}.
  */
@@ -2650,6 +2653,11 @@ public final class SystemServer implements Dumpable {
             // LineageHardware
             t.traceBegin("StartLineageHardwareService");
             mSystemServiceManager.startService(LineageHardwareService.class);
+            t.traceEnd();
+
+            // LiveDisplay
+            t.traceBegin("StartLiveDisplayService");
+            mSystemServiceManager.startService(LiveDisplayService.class);
             t.traceEnd();
         }
 
