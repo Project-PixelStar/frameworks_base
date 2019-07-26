@@ -298,7 +298,8 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces, Tune
             "com.android.systemui.statusbar.banner_action_cancel";
     private static final String BANNER_ACTION_SETUP =
             "com.android.systemui.statusbar.banner_action_setup";
-
+    private static final String LESS_BORING_HEADS_UP =
+            "system:" + Settings.System.LESS_BORING_HEADS_UP;
     private static final int MSG_OPEN_SETTINGS_PANEL = 1002;
     private static final int MSG_LAUNCH_TRANSITION_TIMEOUT = 1003;
     // 1020-1040 reserved for BaseStatusBar
@@ -949,6 +950,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces, Tune
         mKeyguardIndicationController.init();
 
         mColorExtractor.addOnColorsChangedListener(mOnColorsChangedListener);
+        mTunerService.addTunable(this, LESS_BORING_HEADS_UP);
 
         mTunerService.addTunable(this, NAVIGATION_BAR_SHOW);
         mTunerService.addTunable(this, DISPLAY_CUTOUT_HIDDEN);
@@ -4302,8 +4304,12 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces, Tune
             }
         } else if (DISPLAY_CUTOUT_HIDDEN.equals(key)) {
             updateCutoutOverlay(TunerService.parseIntegerSwitch(newValue, false));
+        } else if (LESS_BORING_HEADS_UP.equals(key)) {
+            boolean lessBoringHeadsUp = TunerService.parseIntegerSwitch(newValue, false);
+            mNotificationInterruptStateProvider.setUseLessBoringHeadsUp(lessBoringHeadsUp);
         }
     }
+
 
     @Override
     public GameSpaceManager getGameSpaceManager() {
