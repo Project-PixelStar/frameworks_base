@@ -1642,7 +1642,8 @@
          timeout expires.  May be less than the minimum allowed brightness setting
          that can be set by the user. -->
     <integer name="config_screenBrightnessDim">8</integer>
-    <item name="config_screenBrightnessDimFloat" format="float" type="dimen">0.05</item>
+
+    <item name="config_screenBrightnessDimFloat" format="float" type="dimen">0.0625</item>
 
     <!-- If the screen brightness is already set at or below config_screenBrightnessDim, and the
          user activity timeout expires, we still want to dim the screen slightly to indicate that
