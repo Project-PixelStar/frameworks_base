@@ -17,12 +17,12 @@
 package com.android.systemui.qs.dagger.custom
 
 import com.android.systemui.qs.tileimpl.QSTileImpl
+import com.android.systemui.qs.tiles.DataSwitchTile
 import com.android.systemui.qs.tiles.PowerShareTile
 import com.android.systemui.qs.tiles.CompassTile
 import com.android.systemui.qs.tiles.HeadsUpTile
 import com.android.systemui.qs.tiles.SoundTile
 import com.android.systemui.qs.tiles.SyncTile
-<<<<<<< HEAD:packages/SystemUI/src/com/android/systemui/qs/dagger/custom/QSModuleCustom.kt
 import com.android.systemui.qs.tiles.AmbientDisplayTile
 import com.android.systemui.qs.tiles.UsbTetherTile
 import com.android.systemui.qs.tiles.AODTile
@@ -65,6 +65,12 @@ interface QSModuleCustom {
     @IntoMap
     @StringKey(CompassTile.TILE_SPEC)
     fun bindCompassTile(compassTile: CompassTile): QSTileImpl<*>
+
+    /** Inject DataSwitchTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(DataSwitchTile.TILE_SPEC)
+    fun bindDataSwitchTile(dataSwitchTile: DataSwitchTile): QSTileImpl<*>
 
     /** Inject HeadsUpTile into tileMap in QSModule */
     @Binds
