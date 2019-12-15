@@ -78,6 +78,23 @@ public class GestureNavigationSettingsObserver extends ContentObserver {
                     runnable -> mMainHandler.post(runnable),
                     mOnPropertiesChangedListener);
         });
+        ContentResolver r = mContext.getContentResolver();
+        r.registerContentObserver(
+                Settings.Secure.getUriFor(Settings.Secure.BACK_GESTURE_INSET_SCALE_LEFT),
+                false, this, UserHandle.USER_ALL);
+        r.registerContentObserver(
+                Settings.Secure.getUriFor(Settings.Secure.BACK_GESTURE_INSET_SCALE_RIGHT),
+                false, this, UserHandle.USER_ALL);
+        r.registerContentObserver(
+                Settings.Secure.getUriFor(Settings.Secure.USER_SETUP_COMPLETE),
+                false, this, UserHandle.USER_ALL);
+        DeviceConfig.addOnPropertiesChangedListener(
+                DeviceConfig.NAMESPACE_SYSTEMUI,
+                runnable -> mMainHandler.post(runnable),
+                mOnPropertiesChangedListener);
+        r.registerContentObserver(
+                Settings.System.getUriFor(Settings.System.EDGE_GESTURE_Y_DEAD_ZONE),
+                false, this, UserHandle.USER_ALL);
     }
 
     /**
@@ -176,5 +193,27 @@ public class GestureNavigationSettingsObserver extends ContentObserver {
         final float inset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, backGestureInset,
                 dm);
         return inset;
+    }
+
+    public int getDeadZoneMode() {
+        int mode = Settings.System.getIntForUser(mContext.getContentResolver(),
+            Settings.System.EDGE_GESTURE_Y_DEAD_ZONE, 0,
+            UserHandle.USER_CURRENT);
+        int divider = 0;
+        switch (mode) {
+            default:
+                divider = 0; // mode set to 0, back gesture working on the whole edge
+                break;
+            case 1: // mode set to 1
+                divider = 4;
+                break;
+            case 2: // mode set to 2
+                divider = 3;
+                break;
+            case 3: // mode set to 3, back gesture working only in the half bottom edge
+                divider = 2;
+                break;
+        }
+        return divider;
     }
 }
