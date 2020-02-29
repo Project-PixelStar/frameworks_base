@@ -7450,5 +7450,8 @@ message MetricsEvent {
     CUSTOM_TILES = 2775;
     PIXELSTAR = 2999;
     CUSTOM_CHARGE = 2774;
+
+    // Panel for Mobile Data
+    PANEL_MOBILE_DATA = 4001;
   }
 }
