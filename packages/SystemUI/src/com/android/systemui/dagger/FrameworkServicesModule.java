@@ -124,6 +124,7 @@ import com.android.systemui.dagger.qualifiers.TestHarness;
 import com.android.systemui.shared.system.PackageManagerWrapper;
 import com.android.systemui.user.utils.UserScopedService;
 import com.android.systemui.user.utils.UserScopedServiceImpl;
+import com.android.systemui.statusbar.policy.TaskHelper;
 
 import dagger.Module;
 import dagger.Provides;
@@ -763,5 +764,7 @@ public class FrameworkServicesModule {
     static IDeviceIdleController provideDeviceIdleController() {
         return IDeviceIdleController.Stub.asInterface(
                 ServiceManager.getService(Context.DEVICE_IDLE_CONTROLLER));
+    public TaskHelper provideTaskHelper(Context context) {
+        return new TaskHelper(context);
     }
 }
