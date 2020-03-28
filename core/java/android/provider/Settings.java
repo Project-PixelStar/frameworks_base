@@ -12801,6 +12801,12 @@ public final class Settings {
         public static final String SPOOF_STORAGE_ENCRYPTION_STATUS = "spoof_storage_encryption_status";
         
         /**
+         * Face Unlock Method
+         * @hide
+         */
+        public static final String FACE_UNLOCK_METHOD = "face_unlock_method";
+
+        /**
          * These entries are considered common between the personal and the managed profile,
          * since the managed profile doesn't get to change them.
          */
