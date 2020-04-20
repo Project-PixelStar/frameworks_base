@@ -157,6 +157,7 @@ import com.android.systemui.util.time.SystemClockImpl;
 import com.android.systemui.wallet.dagger.WalletModule;
 import com.android.systemui.wmshell.BubblesManager;
 import com.android.wm.shell.bubbles.Bubbles;
+import com.android.systemui.qs.dagger.custom.QSModuleCustom;
 
 import dagger.Binds;
 import dagger.BindsOptionalOf;
@@ -261,7 +262,8 @@ import javax.inject.Named;
         UserModule.class,
         UtilModule.class,
         NoteTaskModule.class,
-        WalletModule.class
+        WalletModule.class,
+        QSModuleCustom.class
         },
         subcomponents = {
             ComplicationComponent.class,
