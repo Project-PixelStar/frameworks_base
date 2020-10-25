@@ -93,6 +93,7 @@ import com.android.systemui.animation.ActivityTransitionAnimator;
 import com.android.systemui.animation.GhostedViewTransitionAnimatorController;
 import com.android.systemui.bluetooth.BroadcastDialogController;
 import com.android.systemui.broadcast.BroadcastSender;
+import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.dagger.qualifiers.Background;
 import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.media.controls.domain.pipeline.MediaDataManager;
@@ -332,6 +333,8 @@ public class MediaControlPanel {
         }
     }
 
+    private final SysuiColorExtractor mSysuiColorExtractor;
+
     /**
      * Initialize a new control panel
      *
@@ -360,7 +363,8 @@ public class MediaControlPanel {
             NotificationLockscreenUserManager lockscreenUserManager,
             BroadcastDialogController broadcastDialogController,
             GlobalSettings globalSettings,
-            MediaFlags mediaFlags
+            MediaFlags mediaFlags,
+            SysuiColorExtractor colorExtractor
     ) {
         mContext = context;
         mBackgroundExecutor = backgroundExecutor;
@@ -380,6 +384,7 @@ public class MediaControlPanel {
         mLockscreenUserManager = lockscreenUserManager;
         mBroadcastDialogController = broadcastDialogController;
         mMediaFlags = mediaFlags;
+        mSysuiColorExtractor = colorExtractor;
 
         mSeekBarViewModel.setLogSeek(() -> {
             if (mPackageName != null && mInstanceId != null) {
@@ -1016,6 +1021,7 @@ public class MediaControlPanel {
                         appIconView.setImageResource(R.drawable.ic_music_note);
                     }
                 }
+                mSysuiColorExtractor.setMediaBackgroundColor(mColorSchemeTransition.getAccentPrimary().getTargetColor());
                 Trace.endAsyncSection(traceName, traceCookie);
             });
         });

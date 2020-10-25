@@ -395,4 +395,7 @@ oneway interface IStatusBar
      * Toggles flashlight of the device
      */
     void toggleCameraFlash();
+
+    void screenPinningStateChanged(boolean enabled);
+    void leftInLandscapeChanged(boolean isLeft);
 }
