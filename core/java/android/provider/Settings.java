@@ -12681,6 +12681,12 @@ public final class Settings {
         public static final String GESTURE_NAVBAR_LENGTH_MODE = "gesture_navbar_length_mode";
 
         /**
+         * Immersive Navigation gesture
+         * @hide
+         */
+        public static final String IMMERSIVE_NAVIGATION = "immersive_navigation";
+
+        /**
          * Control whether FLAG_SECURE is ignored for all windows.
          * @hide
          */
