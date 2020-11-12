@@ -2298,7 +2298,16 @@ public final class CameraManager {
                 }
                 cameraIds.add(info.mCameraId);
             }
-            return cameraIds.toArray(new String[0]);
+            cameraIds = new String[idCount];
+            idCount = 0;
+            for (int i = 0; i < size; i++) {
+                int status = mDeviceStatus.valueAt(i);
+                if (status == ICameraServiceListener.STATUS_NOT_PRESENT
+                        || status == ICameraServiceListener.STATUS_ENUMERATING) continue;
+                cameraIds[idCount] = mDeviceStatus.keyAt(i);
+                idCount++;
+            }
+            return cameraIds;
         }
 
         private Set<Set<String>> extractConcurrentCameraIdListLocked(int deviceId,
