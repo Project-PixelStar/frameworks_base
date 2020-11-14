@@ -116,6 +116,8 @@ class ScreenRecordPermissionDialogDelegate(
     private lateinit var tapsView: View
     private lateinit var audioSwitch: Switch
     private lateinit var options: Spinner
+    private lateinit var stopDotSwitch: Switch
+    private lateinit var lowQualitySwitch: Switch
 
     override fun createDialog(): SystemUIDialog {
         return systemUIDialogFactory.create(this, context, theme)
@@ -171,6 +173,8 @@ class ScreenRecordPermissionDialogDelegate(
         updateTapsViewVisibility()
 
         options = dialog.requireViewById(R.id.screen_recording_options)
+        stopDotSwitch = dialog.requireViewById(R.id.screenrecord_stopdot_switch)
+        lowQualitySwitch = dialog.requireViewById(R.id.screenrecord_lowquality_switch)
         val a: ArrayAdapter<*> =
             ScreenRecordingAdapter(
                 dialog.context,
@@ -218,6 +222,8 @@ class ScreenRecordPermissionDialogDelegate(
         val audioMode =
             if (audioSwitch.isChecked) options.selectedItem as ScreenRecordingAudioSource
             else ScreenRecordingAudioSource.NONE
+        val showStopDot = stopDotSwitch.isChecked
+        val lowQuality = lowQualitySwitch.isChecked
         val startIntent =
             PendingIntent.getForegroundService(
                 userContext,
@@ -227,7 +233,9 @@ class ScreenRecordPermissionDialogDelegate(
                     Activity.RESULT_OK,
                     audioMode.ordinal,
                     showTaps,
-                    captureTarget
+                    captureTarget,
+                    showStopDot,
+                    lowQuality
                 ),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
