@@ -13,6 +13,7 @@ import com.android.systemui.qs.tiles.VpnTile
 import com.android.systemui.qs.tiles.LiveDisplayTile
 import com.android.systemui.qs.tiles.ReadingModeTile
 import com.android.systemui.qs.tiles.AntiFlickerTile
+import com.android.systemui.qs.tiles.RefreshRateTile
 
 import dagger.Binds
 import dagger.Module
@@ -92,4 +93,11 @@ interface CustomQSModule {
     @IntoMap
     @StringKey(AntiFlickerTile.TILE_SPEC)
     fun bindAntiFlickerTile(antiFlickerTile: AntiFlickerTile): QSTileImpl<*>
+
+    /** Inject RefreshRateTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(RefreshRateTile.TILE_SPEC)
+    fun bindRefreshRateTile(refreshRateTile: RefreshRateTile): QSTileImpl<*>
+
 }
