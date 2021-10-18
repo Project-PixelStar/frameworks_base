@@ -21,6 +21,8 @@ import android.app.ActivityManager;
 import android.app.ActivityThread;
 import android.app.AlertDialog;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.app.IActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -185,6 +187,15 @@ public class CustomUtils {
     public static boolean isWifiOnly(Context context) {
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(
                 Context.CONNECTIVITY_SERVICE);
-        return (cm.isNetworkSupported(ConnectivityManager.TYPE_MOBILE) == false);
+        Network[] networks = cm.getAllNetworks();
+
+        for (Network network : networks) {
+            NetworkCapabilities netCaps = cm.getNetworkCapabilities(network);
+            if (netCaps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
