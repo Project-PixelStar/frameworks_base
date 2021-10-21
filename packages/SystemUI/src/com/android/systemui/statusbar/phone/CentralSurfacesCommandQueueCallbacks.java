@@ -158,6 +158,7 @@ public class CentralSurfacesCommandQueueCallbacks implements CommandQueue.Callba
             ActivityStarter activityStarter,
             EmergencyGestureIntentFactory emergencyGestureIntentFactory) {
             TaskHelper taskHelper) {
+
         mCentralSurfaces = centralSurfaces;
         mQsController = quickSettingsController;
         mContext = context;
@@ -591,5 +592,12 @@ public class CentralSurfacesCommandQueueCallbacks implements CommandQueue.Callba
         mShadeController.performHapticFeedback(
                 HapticFeedbackConstants.GESTURE_START
         );
+    }
+
+    @Override
+    public void toggleCameraFlash() {
+        if (mFlashlightController.isAvailable()) {
+            mFlashlightController.setFlashlight(!mFlashlightController.isEnabled());
+        }
     }
 }

@@ -232,7 +232,10 @@ interface IStatusBarService
     /** Shows rear display educational dialog */
     void showRearDisplayDialog(int currentBaseState);
 
-    void toggleCameraFlash();
-
     void killForegroundApp();
+
+   /**
+     * Toggles flashlight of the device
+     */
+    void toggleCameraFlash();
 }

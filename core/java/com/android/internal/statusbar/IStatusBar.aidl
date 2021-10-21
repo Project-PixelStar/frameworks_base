@@ -401,7 +401,11 @@ oneway interface IStatusBar
 
     void enterDesktop(int displayId);
 
-    void toggleCameraFlash();
 
     void killForegroundApp();
+
+    /**
+     * Toggles flashlight of the device
+     */
+    void toggleCameraFlash();
 }
