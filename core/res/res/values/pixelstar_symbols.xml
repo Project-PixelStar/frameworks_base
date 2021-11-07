@@ -139,4 +139,8 @@
     
     <!-- Whether to enable Lineage Health Service -->
     <java-symbol type="bool" name="config_lineageHealthSupported" />
+
+    <!-- SystemUI Restart -->
+    <java-symbol type="string" name="systemui_restart_title" />
+    <java-symbol type="string" name="systemui_restart_message" />
 </resources>
