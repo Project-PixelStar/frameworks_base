@@ -681,8 +681,8 @@ public class QSPanel extends LinearLayout implements Tunable {
         if (mTileLayout != null && ((View) mTileLayout).getParent() != newParent) {
             switchAllContentToParent(newParent, mTileLayout);
         }
-        if (mHorizontalLinearLayout != null) {
-            mHorizontalLinearLayout.setVisibility(withMedia ? View.VISIBLE : View.GONE);
+        if (mHorizontalLinearLayout == null) return;
+            mHorizontalLinearLayout.setVisibility(horizontal ? View.VISIBLE : View.GONE);
         }
     }
 
