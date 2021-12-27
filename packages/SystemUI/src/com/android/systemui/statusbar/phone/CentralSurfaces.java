@@ -49,6 +49,7 @@ import com.android.systemui.shade.NotificationShadeWindowView;
 import com.android.systemui.shade.ShadeViewController;
 import com.android.systemui.statusbar.notification.row.ExpandableNotificationRow;
 import com.android.systemui.util.Compile;
+import com.android.systemui.statusbar.policy.GameSpaceManager;
 
 import java.io.PrintWriter;
 
@@ -322,6 +323,8 @@ public interface CentralSurfaces extends Dumpable, LifecycleOwner {
     /** @deprecated Use {@link DisplayMetricsRepository} instead. */
     @Deprecated
     float getDisplayDensity();
+
+    GameSpaceManager getGameSpaceManager();
 
     public static class KeyboardShortcutsMessage {
         final int mDeviceId;
