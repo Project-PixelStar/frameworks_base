@@ -88,6 +88,7 @@ import com.android.server.SystemService;
 import com.android.server.servicewatcher.CurrentUserServiceSupplier;
 import com.android.server.servicewatcher.ServiceWatcher;
 import com.android.server.utils.Slogf;
+import com.android.server.LocalServices;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
