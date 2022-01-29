@@ -6498,6 +6498,12 @@ public final class Settings {
         public static final String CUSTOM_NOTIFICATION_VIBRATION_PATTERN = "custom_notification_vibration_pattern";
         
         /**
+         * Whether to enable the pixel navbar animation
+         * @hide
+         */
+        public static final String PIXEL_NAV_ANIMATION = "pixel_nav_animation";
+        
+        /**
          * Whether to enable smart 5G mode
          * @hide
          */
