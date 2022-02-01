@@ -132,19 +132,15 @@ constructor(
      * from the same notification using [NotifUiAdjustment.needReinflate] to determine if it should
      * be reinflated.
      */
-    fun calculateAdjustment(entry: NotificationEntry) =
-        NotifUiAdjustment(
-            key = entry.key,
-            smartActions = entry.ranking.smartActions,
-            smartReplies = entry.ranking.smartReplies,
-            isConversation = entry.ranking.isConversation,
-            isSnoozeEnabled = isSnoozeSettingsEnabled && !entry.isCanceled,
-            isMinimized = isEntryMinimized(entry),
-            needsRedaction =
-                lockscreenUserManager.needsRedaction(entry) ||
-                    (screenshareNotificationHiding() &&
-                        sensitiveNotifProtectionController.shouldProtectNotification(entry)),
-            isChildInGroup = entry.hasEverBeenGroupChild(),
-            isGroupSummary = entry.hasEverBeenGroupSummary(),
-        )
+    fun calculateAdjustment(entry: NotificationEntry) = NotifUiAdjustment(
+        key = entry.key,
+        smartActions = entry.ranking.smartActions,
+        smartReplies = entry.ranking.smartReplies,
+        isConversation = entry.ranking.isConversation,
+        isSnoozeEnabled = isSnoozeSettingsEnabled && !entry.isCanceled,
+        isMinimized = isEntryMinimized(entry),
+        needsRedaction = entry.sbn.isContentSecure || lockscreenUserManager.needsRedaction(entry),
+        isChildInGroup = entry.sbn.isAppOrSystemGroupChild,
+        isGroupSummary = entry.sbn.isAppOrSystemGroupSummary,
+    )
 }
