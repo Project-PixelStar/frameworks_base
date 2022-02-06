@@ -557,9 +557,10 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Callback for invoking a smart action from the screenshot notification. -->
-        <receiver android:name=".screenshot.SmartActionsReceiver"
-                  android:exported="false"/>
+
+        <!-- Callback for Google Lens screenshot notification -->
+        <receiver android:name=".screenshot.LensScreenshotReceiver"
+            android:exported="false" />
 
         <!-- started from UsbDeviceSettingsManager -->
         <activity android:name=".usb.UsbConfirmActivity"
