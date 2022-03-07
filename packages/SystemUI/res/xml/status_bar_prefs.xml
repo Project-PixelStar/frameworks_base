@@ -103,6 +103,11 @@
         android:title="@string/status_bar_alarm"
         android:icon="@drawable/ic_statusbar_alarm" />
 
+    <com.android.systemui.tuner.StatusBarSwitch
+        android:icon="@drawable/ic_statusbar_roaming"
+        android:key="roaming"
+        android:title="@string/status_bar_roaming" />
+
     <com.android.systemui.tuner.BatteryPreference
         android:title="@string/battery"
         android:icon="@*android:drawable/ic_battery"
