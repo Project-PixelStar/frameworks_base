@@ -81,7 +81,11 @@ class FakeMobileIconsInteractor(
 
     override val isForceHidden = MutableStateFlow(false)
 
+<<<<<<< HEAD
     override val isDeviceInEmergencyCallsOnlyMode = MutableStateFlow(false)
+=======
+    override val isRoamingForceHidden = MutableStateFlow(false)
+>>>>>>> 9325f75b8e64 (SystemUI: Add roaming indicator to statusbar tuner)
 
     /** Always returns a new fake interactor */
     override fun getMobileConnectionInteractorForSubId(subId: Int): FakeMobileIconInteractor {
