@@ -11748,7 +11748,7 @@ public final class Settings {
         public static final String FACE_UNLOCK_METHOD = "face_unlock_method";
 
         /**
-         * What happens when the user presses the Home button when the
+        * What happens when the user presses the Home button when the
          * phone is ringing.<br/>
          * <b>Values:</b><br/>
          * 1 - Nothing happens. (Default behavior)<br/>
@@ -11810,6 +11810,13 @@ public final class Settings {
         @SystemApi(client = SystemApi.Client.MODULE_LIBRARIES)
         @SuppressLint("NoSettingsProvider")
         public static final String TETHERING_ALLOW_VPN_UPSTREAMS = "tethering_allow_vpn_upstreams";
+
+        /**
+         * Control whether FLAG_SECURE is ignored for all windows.
+         * @hide
+         */
+        @Readable
+        public static final String WINDOW_IGNORE_SECURE = "window_ignore_secure";
 
         /**
          * These entries are considered common between the personal and the managed profile,
