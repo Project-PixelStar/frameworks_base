@@ -27,6 +27,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import android.app.ActivityManager;
+import android.view.SurfaceControl;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SmallTest;
@@ -37,6 +38,7 @@ import com.android.wm.shell.ShellTestCase;
 import com.android.wm.shell.TestRunningTaskInfoBuilder;
 import com.android.wm.shell.desktopmode.DesktopModeTaskRepository;
 import com.android.wm.shell.shared.DesktopModeStatus;
+import com.android.wm.shell.recents.RecentTasksController;
 import com.android.wm.shell.sysui.ShellInit;
 import com.android.wm.shell.windowdecor.WindowDecorViewModel;
 
@@ -66,6 +68,11 @@ public final class FreeformTaskListenerTests extends ShellTestCase {
     private WindowDecorViewModel mWindowDecorViewModel;
     @Mock
     private DesktopModeTaskRepository mDesktopModeTaskRepository;
+    @Mock
+    private SurfaceControl mSurfaceControl;
+    @Mock
+    private RecentTasksController mRecentsTaskController;
+
     private FreeformTaskListener mFreeformTaskListener;
     private StaticMockitoSession mMockitoSession;
 
@@ -80,7 +87,8 @@ public final class FreeformTaskListenerTests extends ShellTestCase {
                 mShellInit,
                 mTaskOrganizer,
                 Optional.of(mDesktopModeTaskRepository),
-                mWindowDecorViewModel);
+                mWindowDecorViewModel,
+                Optional.of(mRecentsTaskController));
     }
 
     @Test
@@ -105,6 +113,15 @@ public final class FreeformTaskListenerTests extends ShellTestCase {
 
         verify(mDesktopModeTaskRepository, never())
                 .addOrMoveFreeformTaskToTop(fullscreenTask.displayId, fullscreenTask.taskId);
+    }
+
+    @Test
+    public void testOnTaskAppeared_removesSplitPair() {
+        final ActivityManager.RunningTaskInfo taskInfo = new ActivityManager.RunningTaskInfo();
+        taskInfo.taskId = 123;
+        mFreeformTaskListener.onTaskAppeared(taskInfo, mSurfaceControl);
+
+        verify(mRecentsTaskController).removeSplitPair(taskInfo.taskId);
     }
 
     @After
