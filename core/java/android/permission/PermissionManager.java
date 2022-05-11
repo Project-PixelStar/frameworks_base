@@ -1407,6 +1407,8 @@ public final class PermissionManager {
                     R.array.config_locationExtraPackageNames);
             sExemptedPkgNames = context.getResources().getStringArray(
                     R.array.config_indicatorExemptedPackageNames);
+            sExemptedPkgNames = context.getResources().getStringArray(
+                    org.lineageos.platform.internal.R.array.config_indicatorExemptedPackageNames);
         }
     }
     /**
