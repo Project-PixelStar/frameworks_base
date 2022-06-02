@@ -80,6 +80,9 @@ public class GestureNavigationSettingsObserver extends ContentObserver {
         r.registerContentObserver(
                 Settings.System.getUriFor(Settings.System.EDGE_GESTURE_Y_DEAD_ZONE),
                 false, this, UserHandle.USER_ALL);
+		r.registerContentObserver(
+                Settings.System.getUriFor(Settings.System.LOCK_GESTURE_STATUS),
+                false, this, UserHandle.USER_ALL);
     }
 
     /**
