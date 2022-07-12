@@ -136,7 +136,6 @@ public class CastTile extends QSTileImpl<BooleanState> {
     @Override
     public BooleanState newTileState() {
         BooleanState state = new BooleanState();
-        state.handlesLongClick = false;
         return state;
     }
 
@@ -163,6 +162,7 @@ public class CastTile extends QSTileImpl<BooleanState> {
     @Override
     protected void handleLongClick(@Nullable Expandable expandable) {
         handleClick(expandable);
+        return CAST_SETTINGS;
     }
 
     @Override
