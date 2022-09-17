@@ -416,6 +416,10 @@ public class InternetDialogDelegate implements
                         dialog.getContext(), mDefaultDataSubId, isChecked, false);
             }
         });
+        mMobileNetworkLayout.setOnLongClickListener(v -> {
+                mInternetDialogController.launchMobileNetworkSetting(v);
+                return true;
+        });
         mHotspotLayout.setOnLongClickListener(v -> {
                 mInternetDialogController.launchHotspotSetting(v);
                 return true;
