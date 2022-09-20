@@ -46,6 +46,7 @@ import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.SystemProperties;
 import android.os.Handler;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -175,15 +176,20 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
     // Determines if we should ignore THEME_CUSTOMIZATION_OVERLAY_PACKAGES setting changes.
     private boolean mSkipSettingChange;
 
-    private final ConfigurationListener mConfigurationListener =
-            new ConfigurationListener() {
-                @Override
-                public void onUiModeChanged() {
-                    Log.i(TAG, "Re-applying theme on UI change");
-                    reevaluateSystemTheme(true /* forceReload */);
-                }
-            };
-
+	private final ConfigurationListener mConfigurationListener = new ConfigurationListener() {
+    	@Override
+    	public void onUiModeChanged() {
+    	    Log.i(TAG, "Re-applying theme on UI change");
+    	    reevaluateSystemTheme(true /* forceReload */);
+    	    setBootColorProps(); // Add this line to set boot color properties when UI mode changes
+    	}
+	
+    	@Override
+    	public void onThemeChanged() {
+    	    setBootColorProps(); // Add this line to set boot color properties when theme changes
+    	}
+	};
+    	
     private final DeviceProvisionedListener mDeviceProvisionedListener =
             new DeviceProvisionedListener() {
                 @Override
@@ -547,6 +553,25 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
                 }
             }
         });
+
+        // To set props without needing an overlay change, Usually the props are only set when you first change wallpaper i.e after overlay change.
+        // we wish to avoid this, call setBootColorProps at the start of service, this will set props on boot so by the time you first reboot,
+        // boot colors would already be there and bootanim would be colored.
+        setBootColorProps();
+    }
+
+    private void setBootColorProps() {
+        // persist.bootanim.color1, persist.bootanim.color2, persist.bootanim.color3, persist.bootanim.color4
+        int[] bootColors = {android.R.color.system_accent3_100, android.R.color.system_accent1_300, android.R.color.system_accent2_500, android.R.color.system_accent1_100};
+        try {
+            for (int i = 0; i < bootColors.length; i++) {
+                String color = String.valueOf(mResources.getColor(bootColors[i]));
+                SystemProperties.set(String.format("persist.bootanim.color%d", i + 1), color);
+                Log.d("ThemeOverlayController", String.format("Writing boot color boot animation colors: %d %s", i, color));
+            }
+        } catch (RuntimeException e) {
+            Log.w("ThemeOverlayController", "Cannot set sysprop. Look for 'init' and 'dmesg' logs for more info.");
+        }
     }
 
     private void reevaluateSystemTheme(boolean forceReload) {
