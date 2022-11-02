@@ -827,7 +827,7 @@ class Session extends IWindowSession.Stub implements IBinder.DeathRecipient {
         if (changed && noSystemOverlayPermission) {
             if (mAlertWindowSurfaces.isEmpty()) {
                 cancelAlertWindowNotification();
-            } else if (mAlertWindowNotification == null && !isSatellitePointingUiPackage()) {
+            } else if (mAlertWindowNotification == null) {
                 mAlertWindowNotification = new AlertWindowNotification(mService, mPackageName,
                         UserHandle.getUserId(mUid));
                 if (mShowingAlertWindowNotificationAllowed) {
