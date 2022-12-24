@@ -25,10 +25,13 @@ import android.app.TaskStackListener;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Binder;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Process;
 import android.os.SystemProperties;
 import android.util.Log;
+
+import com.android.internal.R;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -168,6 +171,9 @@ public class PixelPropsUtils {
             "bramble",
             "sunfish"
     };
+
+    private static final String sNetflixModel =
+            Resources.getSystem().getString(R.string.config_netflixSpoofModel);
 
     private static volatile boolean sIsGms, sIsFinsky, sIsPhotos;
 
@@ -340,6 +346,11 @@ public class PixelPropsUtils {
         // Set proper indexing fingerprint
         if (packageName.equals("com.google.android.settings.intelligence")) {
             setPropValue("FINGERPRINT", Build.VERSION.INCREMENTAL);
+            return;
+        }
+        if (!sNetflixModel.isEmpty() && packageName.equals("com.netflix.mediaclient")) {
+            if (DEBUG) Log.d(TAG, "Setting model to " + sNetflixModel + " for Netflix");
+            setPropValue("MODEL", sNetflixModel);
             return;
         }
     }
