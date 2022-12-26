@@ -56,4 +56,6 @@
 
     <!--Deprecated. After sdk 35, don't use it-->
     <color name="settingslib_colorSurface">@color/settingslib_surface_dark</color>
+
+    <color name="settingslib_colorPrimaryBackground">@color/settingslib_primary_dark_device_default_settings</color>
 </resources>
