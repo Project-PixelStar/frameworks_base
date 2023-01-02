@@ -270,7 +270,6 @@ public class PixelPropsUtils {
         if (packageName.startsWith("com.google.")
                 || packageName.startsWith("com.samsung.")
                 || Arrays.asList(extraPackagesToChange).contains(packageName)) {
-
             boolean isPixelDevice = Arrays.asList(pixelCodenames).contains(SystemProperties.get(DEVICE));
 
             if (packageName.equals("com.android.vending")) {
@@ -292,6 +291,15 @@ public class PixelPropsUtils {
                     propsToChange.putAll(propsToChangePixel5);
                 }
             }
+        } else if (Arrays.asList(packagesToChangeROG1).contains(packageName)) {
+            propsToChange.putAll(propsToChangeROG1);
+        } else if (Arrays.asList(packagesToChangeXP5).contains(packageName)) {
+            propsToChange.putAll(propsToChangeXP5);
+        } else if (Arrays.asList(packagesToChangeOP8P).contains(packageName)) {
+            propsToChange.putAll(propsToChangeOP8P);
+        } else if (Arrays.asList(packagesToChangeMI11).contains(packageName)) {
+            propsToChange.putAll(propsToChangeMI11);
+        }
 
             if (Arrays.asList(packagesToChangeROG1).contains(packageName)) {
                 propsToChange.putAll(propsToChangeROG1);
@@ -303,21 +311,21 @@ public class PixelPropsUtils {
                 propsToChange.putAll(propsToChangeMI11);
             }
 
-            if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
-            for (Map.Entry<String, Object> prop : propsToChange.entrySet()) {
-                String key = prop.getKey();
-                Object value = prop.getValue();
-                if (propsToKeep.containsKey(packageName) && propsToKeep.get(packageName).contains(key)) {
-                    if (DEBUG) Log.d(TAG, "Not defining " + key + " prop for: " + packageName);
-                    continue;
-                }
-                if (DEBUG) Log.d(TAG, "Defining " + key + " prop for: " + packageName);
-                setPropValue(key, value);
+        if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
+        for (Map.Entry<String, Object> prop : propsToChange.entrySet()) {
+            String key = prop.getKey();
+            Object value = prop.getValue();
+            if (propsToKeep.containsKey(packageName) && propsToKeep.get(packageName).contains(key)) {
+                if (DEBUG) Log.d(TAG, "Not defining " + key + " prop for: " + packageName);
+                continue;
             }
-            // Set proper indexing fingerprint
-            if (packageName.equals("com.google.android.settings.intelligence")) {
-                setPropValue("FINGERPRINT", Build.VERSION.INCREMENTAL);
-            }
+            if (DEBUG) Log.d(TAG, "Defining " + key + " prop for: " + packageName);
+            setPropValue(key, value);
+        }
+        // Set proper indexing fingerprint
+        if (packageName.equals("com.google.android.settings.intelligence")) {
+            setPropValue("FINGERPRINT", Build.VERSION.INCREMENTAL);
+            return;
         }
     }
 
