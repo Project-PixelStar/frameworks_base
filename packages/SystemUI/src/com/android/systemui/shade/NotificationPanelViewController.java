@@ -2767,6 +2767,11 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
             mNotificationStackScrollLayoutController.setMaxAlphaForKeyguard(alpha,
                     "NPVC.updateNotificationTranslucency()");
         }
+            if (mQsController.isExpandImmediate() && !mQsController.getFullyExpanded()) {
+                alpha = 0f;
+            }
+            mNotificationStackScrollLayoutController.setMaxAlphaForExpansion(alpha);
+         }
     }
 
     private float getFadeoutAlpha() {
