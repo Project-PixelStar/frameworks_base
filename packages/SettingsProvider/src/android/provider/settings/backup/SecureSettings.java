@@ -253,6 +253,7 @@ public class SecureSettings {
         Settings.Secure.STATUS_BAR_CLOCK_POSITION,
         Settings.Secure.VPN_ENFORCE_DNS,
         Settings.Secure.DOZE_PICK_UP_GESTURE_AMBIENT,
-        Settings.Secure.DOZE_TAP_GESTURE_AMBIENT
+        Settings.Secure.DOZE_TAP_GESTURE_AMBIENT,
+        Settings.Secure.MEDIA_CONTROLS_ALWAYS_SHOW_TIME
     };
 }
