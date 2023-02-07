@@ -1289,4 +1289,9 @@ public abstract class ActivityManagerInternal {
      */
     public abstract void killApplicationSync(String pkgName, int appId, int userId,
             String reason, int exitInfoReason);
+
+    public abstract boolean queryActivityAllowed(ComponentName resolvedActivity, Intent intent, int callerUid,
+        int callerPid, String resolvedType, ApplicationInfo resolvedApp);
+    public abstract boolean queryServiceAllowed(ComponentName resolvedService, Intent intent, int callerUid,
+        int callerPid, String resolvedType, ApplicationInfo resolvedApp);
 }
