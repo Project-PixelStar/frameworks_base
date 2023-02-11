@@ -84,6 +84,7 @@ import com.android.systemui.statusbar.policy.DeviceProvisionedController;
 import com.android.systemui.statusbar.policy.DeviceProvisionedController.DeviceProvisionedListener;
 import com.android.systemui.util.kotlin.JavaAdapter;
 import com.android.systemui.util.settings.SecureSettings;
+import com.android.systemui.util.settings.SystemSettings;
 
 import com.google.ux.material.libmonet.dynamiccolor.MaterialDynamicColors;
 import com.google.ux.material.libmonet.hct.Hct;
@@ -133,6 +134,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
     private final BroadcastDispatcher mBroadcastDispatcher;
     private final Executor mBgExecutor;
     private final SecureSettings mSecureSettings;
+    private final SystemSettings mSystemSettings;
     private final Executor mMainExecutor;
     private final Handler mBgHandler;
     private final Context mContext;
@@ -428,6 +430,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
             WakefulnessLifecycle wakefulnessLifecycle,
             JavaAdapter javaAdapter,
             KeyguardTransitionInteractor keyguardTransitionInteractor,
+            SystemSettings systemSettings,
             UiModeManager uiModeManager,
             ConfigurationController configurationController) {
         mContext = context;
@@ -442,6 +445,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
         mBgHandler = bgHandler;
         mThemeManager = themeOverlayApplier;
         mSecureSettings = secureSettings;
+        mSystemSettings = systemSettings;
         mWallpaperManager = wallpaperManager;
         mUserTracker = userTracker;
         mResources = resources;
@@ -536,6 +540,19 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
         if (!mIsMonetEnabled) {
             return;
         }
+
+        mSystemSettings.registerContentObserverForUser(
+                Settings.System.getUriFor(Settings.System.QS_PANEL_TILE_HAPTIC),
+                false,
+                new ContentObserver(mBgHandler) {
+                    @Override
+                    public void onChange(boolean selfChange, Collection<Uri> collection, int flags,
+                            int userId) {
+                        reevaluateSystemTheme(true /* forceReload */);
+                    }
+                },
+                UserHandle.USER_ALL);
+
 
         mUserTracker.addCallback(mUserTrackerCallback, mMainExecutor);
 

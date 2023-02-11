@@ -19,6 +19,10 @@ package com.android.systemui.settings.brightness;
 import static com.android.systemui.Flags.hapticBrightnessSlider;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -42,6 +46,7 @@ import com.android.systemui.util.ViewController;
 import com.android.systemui.util.time.SystemClock;
 
 import javax.inject.Inject;
+import java.time.Duration;
 
 import kotlinx.coroutines.CoroutineDispatcher;
 
@@ -66,6 +71,9 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
     private final UiEventLogger mUiEventLogger;
 
     private final BrightnessSliderHapticPlugin mBrightnessSliderHapticPlugin;
+
+    private Context mContext;
+    private Duration hapticDuration = Duration.ofMillis(3);
 
     private final Gefingerpoken mOnInterceptListener = new Gefingerpoken() {
         @Override
@@ -112,6 +120,33 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
 
     public ImageView getIcon() {
         return mIcon;
+    }
+
+    private void triggerVibration(Context context, boolean tracking) {
+        Vibrator vibrator = context.getSystemService(Vibrator.class);
+        int vibrateIntensity = Settings.System.getInt(context.getContentResolver(),
+                    Settings.System.BRIGHTNESS_SLIDER_HAPTICS_INTENSITY, 1);
+        if (vibrator == null || !tracking || vibrateIntensity == 0) {
+            return;
+        }
+
+            VibrationEffect effect;
+            switch (vibrateIntensity) {
+                case 1:
+                    effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_TEXTURE_TICK);
+                    break;
+                case 2:
+                    effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK);
+                    break;
+                case 3:
+                    effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK);
+                    break;
+                default:
+                    effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_TEXTURE_TICK);
+                    break;
+            }
+
+        AsyncTask.execute(() -> vibrator.vibrate(effect));
     }
 
     @Override
@@ -237,6 +272,8 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
                     eventProducer.onProgressChanged(seekBar, progress, fromUser);
                 }
             }
+            mContext = mView.getContext();
+            triggerVibration(mContext, mTracking);
         }
 
         @Override
@@ -256,6 +293,9 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
                 mMirrorController.showMirror();
                 mMirrorController.setLocationAndSize(mView);
             }
+            
+            mContext = mView.getContext();
+            triggerVibration(mContext, mTracking);
         }
 
         @Override

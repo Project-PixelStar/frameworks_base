@@ -6380,6 +6380,13 @@ public final class Settings {
          * @hide
          */
         public static final String LIVE_DISPLAY_HINTED = "live_display_hinted";
+
+        /**
+         * QS panel tile haptics intensity
+         * @hide
+         */
+        @Readable
+        public static final String QS_PANEL_TILE_HAPTIC = "qs_panel_tile_haptic";
         
         /**
          * Whether charging control should be enabled.
@@ -6464,6 +6471,27 @@ public final class Settings {
          * @hide
          */
         public static final String EDGE_GESTURE_Y_DEAD_ZONE = "edge_gesture_y_dead_zone";
+
+        /**
+         * Edge scrolling haptics intensity
+         * @hide
+         */
+        @Readable
+        public static final String EDGE_SCROLLING_HAPTICS_INTENSITY = "edge_scrolling_haptics_intensity";
+
+        /**
+         * Brightness sliding haptics intensity
+         * @hide
+         */
+        @Readable
+        public static final String BRIGHTNESS_SLIDER_HAPTICS_INTENSITY = "brightness_slider_haptics_intensity";
+
+        /**
+         * Volume sliding haptics intensity
+         * @hide
+         */
+        @Readable
+        public static final String VOLUME_SLIDER_HAPTICS_INTENSITY = "volume_slider_haptics_intensity";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to
