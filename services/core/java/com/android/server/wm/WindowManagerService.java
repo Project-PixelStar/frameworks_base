@@ -1725,6 +1725,9 @@ public class WindowManagerService extends IWindowManager.Stub
             mWindowMap.put(client.asBinder(), win);
             win.initAppOpsState();
 
+            // Device Integration: add black window if match
+            BlackScreenWindowManager.getInstance().onWindowAdded(win);
+
             final boolean suspended = mPmInternal.isPackageSuspended(win.getOwningPackage(),
                     UserHandle.getUserId(win.getOwningUid()));
             win.setHiddenWhileSuspended(suspended);
@@ -1973,6 +1976,9 @@ public class WindowManagerService extends IWindowManager.Stub
     void postWindowRemoveCleanupLocked(WindowState win) {
         ProtoLog.v(WM_DEBUG_ADD_REMOVE, "postWindowRemoveCleanupLocked: %s", win);
         mWindowMap.remove(win.mClient.asBinder());
+
+        // Device Integration: Remove black screen if match
+        BlackScreenWindowManager.getInstance().onWindowRemoved(win);
 
         final DisplayContent dc = win.getDisplayContent();
         dc.getDisplayRotation().markForSeamlessRotation(win, false /* seamlesslyRotated */);
@@ -2621,7 +2627,7 @@ public class WindowManagerService extends IWindowManager.Stub
         WindowSurfaceController surfaceController;
         try {
             Trace.traceBegin(TRACE_TAG_WINDOW_MANAGER, "createSurfaceControl");
-            surfaceController = winAnimator.createSurfaceLocked();
+            surfaceController = winAnimator.createSurfaceLocked(win.mAttrs.type);
         } finally {
             Trace.traceEnd(TRACE_TAG_WINDOW_MANAGER);
         }
