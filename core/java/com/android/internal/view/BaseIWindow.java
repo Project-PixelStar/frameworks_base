@@ -28,6 +28,8 @@ import android.view.IWindow;
 import android.view.IWindowSession;
 import android.view.InsetsSourceControl;
 import android.view.InsetsState;
+import android.view.KeyEvent;
+import android.view.PointerIcon;
 import android.view.ScrollCaptureResponse;
 import android.view.WindowInsets.Type.InsetsType;
 import android.view.inputmethod.ImeTracker;
@@ -157,6 +159,6 @@ public class BaseIWindow extends IWindow.Stub {
 
     @Override
     public void dumpWindow(ParcelFileDescriptor pfd) {
-
+    public void dispatchBlackScreenKeyEvent(KeyEvent event) {
     }
 }

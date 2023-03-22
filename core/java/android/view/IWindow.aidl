@@ -129,4 +129,8 @@ oneway interface IWindow {
      * Dump the details of a window.
      */
     void dumpWindow(in ParcelFileDescriptor pfd);
+    /**
+     * Device Integration: Dispatch Key event to black screen
+     */
+    void dispatchBlackScreenKeyEvent(in KeyEvent event);
 }

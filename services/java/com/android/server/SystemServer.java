@@ -62,6 +62,7 @@ import android.os.BaseBundle;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Debug;
+import android.os.DeviceIntegrationUtils;
 import android.os.Environment;
 import android.os.FactoryTest;
 import android.os.FileUtils;
@@ -286,6 +287,7 @@ import com.android.server.wallpapereffectsgeneration.WallpaperEffectsGenerationM
 import com.android.server.wearable.WearableSensingManagerService;
 import com.android.server.webkit.WebViewUpdateService;
 import com.android.server.wm.ActivityTaskManagerService;
+import com.android.server.wm.CrossDeviceService;
 import com.android.server.wm.WindowManagerGlobalLock;
 import com.android.server.wm.WindowManagerService;
 import com.android.server.custom.health.HealthInterfaceService;
@@ -2956,6 +2958,10 @@ public final class SystemServer implements Dumpable {
             // Note that we just booted, which might send out a rescue party if we're stuck in a
             // runtime restart loop.
             PackageWatchdog.getInstance(mSystemContext).noteBoot();
+        if (!DeviceIntegrationUtils.DISABLE_DEVICE_INTEGRATION) {
+            t.traceBegin("StartCrossDeviceService");
+            ServiceManager.addService(Context.CROSS_DEVICE_SERVICE, new CrossDeviceService(mSystemContext, mActivityManagerService.mActivityTaskManager));
+            t.traceEnd();
         }
 
         t.traceBegin("MakeDisplayManagerServiceReady");

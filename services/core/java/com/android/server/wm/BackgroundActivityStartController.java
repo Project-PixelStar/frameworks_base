@@ -66,6 +66,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.DeviceIntegrationUtils;
 import android.os.Process;
 import android.os.SystemClock;
 import android.os.UserHandle;
@@ -841,6 +842,35 @@ public class BackgroundActivityStartController {
 
         // don't abort if the callingUid is a persistent system process
         if (state.mIsCallingUidPersistentSystemProcess) {
+
+        // This is used to block background activity launch even if the app is still
+        // visible to user after user clicking home button.
+        final int appSwitchState = mService.getBalAppSwitchesState();
+
+        if (!DeviceIntegrationUtils.DISABLE_DEVICE_INTEGRATION
+            && mService.getRemoteTaskManager().isFromBackgroundWhiteList(state.mRealCallingUid)) {
+            return new BalVerdict(BAL_ALLOW_DEFAULT, false, "Default");
+        }
+        // don't abort if the callingUid has a visible window or is a persistent system process
+        final int callingUidProcState = mService.mActiveUids.getUidState(callingUid);
+        final boolean callingUidHasAnyVisibleWindow = mService.hasActiveVisibleWindow(callingUid);
+        final boolean isCallingUidPersistentSystemProcess =
+                callingUidProcState <= ActivityManager.PROCESS_STATE_PERSISTENT_UI;
+
+        // Normal apps with visible app window will be allowed to start activity if app switching
+        // is allowed, or apps like live wallpaper with non app visible window will be allowed.
+        final boolean appSwitchAllowedOrFg =
+                appSwitchState == APP_SWITCH_ALLOW || appSwitchState == APP_SWITCH_FG_ONLY;
+        if (appSwitchAllowedOrFg && callingUidHasAnyVisibleWindow) {
+            return new BalVerdict(BAL_ALLOW_VISIBLE_WINDOW,
+                    /*background*/ false, "callingUid has visible window");
+        }
+        if (mService.mActiveUids.hasNonAppVisibleWindow(callingUid)) {
+            return new BalVerdict(BAL_ALLOW_NON_APP_VISIBLE_WINDOW,
+                    /*background*/ false, "callingUid has non-app visible window");
+        }
+
+        if (isCallingUidPersistentSystemProcess) {
             return new BalVerdict(BAL_ALLOW_ALLOWLISTED_COMPONENT,
                     /*background*/ false, "callingUid is persistent system process");
         }
