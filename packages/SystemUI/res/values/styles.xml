@@ -264,14 +264,14 @@
     </style>
 
     <style name="TextAppearance.AuthNonBioCredential.Subtitle">
-        <item name="android:fontFamily">@*android:string/config_headlineFontFamily</item>
+        <item name="android:fontFamily">@*android:string/config_bodyFontFamily</item>
         <item name="android:layout_marginTop">20dp</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?androidprv:attr/materialColorOnSurface</item>
     </style>
 
     <style name="TextAppearance.AuthNonBioCredential.Description">
-        <item name="android:fontFamily">@*android:string/config_headlineFontFamily</item>
+        <item name="android:fontFamily">@*android:string/config_bodyFontFamily</item>
         <item name="android:layout_marginTop">20dp</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?androidprv:attr/materialColorOnSurface</item>
@@ -1624,14 +1624,14 @@
     <style name="TextAppearance.MagnificationSetting" />
 
     <style name="TextAppearance.MagnificationSetting.Title">
-        <item name="android:fontFamily">google-sans</item>
+        <item name="android:fontFamily">@*android:string/config_headlineFontFamily</item>
         <item name="android:textColor">?androidprv:attr/textColorPrimary</item>
         <item name="android:textSize">@dimen/magnification_setting_text_size</item>
         <item name="android:singleLine">true</item>
     </style>
 
     <style name="TextAppearance.MagnificationSetting.EditButton">
-        <item name="android:fontFamily">google-sans</item>
+        <item name="android:fontFamily">@*android:string/config_bodyFontFamily</item>
         <item name="android:textColor">?androidprv:attr/colorAccent</item>
         <item name="android:textSize">@dimen/magnification_setting_text_size</item>
         <item name="android:lineHeight">@dimen/magnification_setting_button_line_height</item>
@@ -1639,7 +1639,7 @@
     </style>
 
     <style name="TextAppearance.MagnificationSetting.DoneButton">
-        <item name="android:fontFamily">google-sans</item>
+        <item name="android:fontFamily">@*android:string/config_bodyFontFamily</item>
         <item name="android:textColor">?androidprv:attr/textColorPrimary</item>
         <item name="android:textSize">@dimen/magnification_setting_text_size</item>
         <item name="android:lineHeight">@dimen/magnification_setting_button_line_height</item>
