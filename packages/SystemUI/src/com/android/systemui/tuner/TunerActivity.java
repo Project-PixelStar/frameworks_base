@@ -27,6 +27,8 @@ import android.widget.Toolbar;
 
 import java.util.ArrayDeque;
 
+import java.util.ArrayDeque;
+
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragment;
 import androidx.preference.PreferenceScreen;
