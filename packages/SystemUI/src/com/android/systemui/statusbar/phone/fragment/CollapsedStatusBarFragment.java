@@ -337,6 +337,10 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         showClock(false);
         initOperatorName();
         initNotificationIconArea();
+
+        mContext = getContext();
+        Dependency.get(TunerService.class).addTunable(this, StatusBarIconController.ICON_HIDE_LIST);
+
         mSystemEventAnimator = getSystemEventAnimator();
 
         mContext = getContext();
