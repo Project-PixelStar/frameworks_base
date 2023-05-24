@@ -282,6 +282,7 @@ public class SecureSettings {
         Settings.Secure.ON_DEVICE_INTELLIGENCE_IDLE_TIMEOUT_MS,
         Settings.Secure.SYSTEM_BLACK_THEME,
         Settings.Secure.DOZE_DOUBLE_TAP_GESTURE_AMBIENT,
-        Settings.Secure.DOZE_PICK_UP_GESTURE_AMBIENT
+        Settings.Secure.DOZE_PICK_UP_GESTURE_AMBIENT,
+        Settings.Secure.DOZE_SINGLE_TAP_GESTURE_AMBIENT,
     };
 }
