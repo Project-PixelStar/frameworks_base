@@ -44,7 +44,10 @@
 
     <!-- The CPUs to display in CPUInfoService view -->
     <string name="config_displayCpus" translatable="false"></string>
-
+    
+    <!-- Doze: does the single tap sensor need a proximity check? -->
+    <bool name="doze_single_tap_proximity_check">false</bool>
+    
     <!-- Whether usage of the proximity sensor during doze is supported -->
     <bool name="doze_proximity_sensor_supported">true</bool>
     
