@@ -95,6 +95,11 @@ public class PixelPropsUtils {
             "com.gameloft.android.ANMP.GloftA9HM"
     };
 
+    private static final Map<String, Object> propsToChangeK30U;
+    private static final String[] packagesToChangeK30U = {
+            "com.pubg.imobile"
+    };
+
     private static final Map<String, Object> propsToChangeXP5;
     private static final String[] packagesToChangeXP5 = {
             "com.tencent.tmgp.kr.codm",
@@ -106,7 +111,6 @@ public class PixelPropsUtils {
     private static final String[] packagesToChangeOP8P = {
             "com.netease.lztgglobal",
             "com.tencent.ig",
-            "com.pubg.imobile",
             "com.pubg.krmobile",
             "com.vng.pubgmobile",
             "com.rekoo.pubgm",
@@ -231,6 +235,9 @@ public class PixelPropsUtils {
         propsToChangeF4 = new HashMap<>();
         propsToChangeF4.put("MODEL", "22021211RG");
         propsToChangeF4.put("MANUFACTURER", "Xiaomi");
+        propsToChangeK30U = new HashMap<>();
+        propsToChangeK30U.put("MODEL", "M2006J10C");
+        propsToChangeK30U.put("MANUFACTURER", "Xiaomi");
     }
 
     private static boolean isGoogleCameraPackage(String packageName) {
@@ -318,6 +325,8 @@ public class PixelPropsUtils {
                     propsToChange.putAll(propsToChangePixel5);
                 }
             }
+        } else if (Arrays.asList(packagesToChangeK30U).contains(packageName)) {
+            propsToChange.putAll(propsToChangeK30U);
         } else if (Arrays.asList(packagesToChangeROG6).contains(packageName)) {
             propsToChange.putAll(propsToChangeROG6);
         } else if (Arrays.asList(packagesToChangeXP5).contains(packageName)) {
