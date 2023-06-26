@@ -67,6 +67,7 @@ import com.android.settingslib.graph.LandscapeBatteryL;
 import com.android.settingslib.graph.LandscapeBatteryM;
 import com.android.settingslib.graph.LandscapeBatteryN;
 import com.android.settingslib.graph.LandscapeBatteryO;
+import com.android.settingslib.graph.LandscapeBatteryDrawableOrigami;
 import com.android.systemui.Dependency;
 import com.android.systemui.DualToneHandler;
 import com.android.systemui.plugins.DarkIconDispatcher;
@@ -106,6 +107,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver ,Tune
     protected static final int BATTERY_STYLE_LANDSCAPEM = 22;
     protected static final int BATTERY_STYLE_LANDSCAPEN = 23;
     protected static final int BATTERY_STYLE_LANDSCAPEO = 24;
+    protected static final int BATTERY_STYLE_LANDSCAPE_ORIGAMI = 25;
 
     @Retention(SOURCE)
     @IntDef({MODE_DEFAULT, MODE_ON, MODE_OFF, MODE_ESTIMATE})
@@ -195,6 +197,8 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver ,Tune
     private final LandscapeBatteryM mLandscapeBatteryM;
     private final LandscapeBatteryN mLandscapeBatteryN;
     private final LandscapeBatteryO mLandscapeBatteryO;
+    private final LandscapeBatteryDrawableOrigami mLandscapeDrawableOrigami;
+
     private final ImageView mBatteryIconView;
     private final ImageView mChargingIconView;
     private TextView mBatteryPercentView;
@@ -263,6 +267,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver ,Tune
         mLandscapeBatteryM = new LandscapeBatteryM(context, frameColor);
         mLandscapeBatteryN = new LandscapeBatteryN(context, frameColor);
         mLandscapeBatteryO = new LandscapeBatteryO(context, frameColor);
+        mLandscapeDrawableOrigami = new LandscapeBatteryDrawableOrigami(context, frameColor);
         atts.recycle();
 
         setupLayoutTransition();
@@ -276,10 +281,14 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver ,Tune
                 || mBatteryStyle == BATTERY_STYLE_FULL_CIRCLE ?
                 getResources().getDimensionPixelSize(R.dimen.status_bar_battery_icon_circle_width) :
                 getResources().getDimensionPixelSize(R.dimen.status_bar_battery_icon_height);
+        batteryHeight = mBatteryStyle == BATTERY_STYLE_LANDSCAPE_ORIGAMI ?
+                getResources().getDimensionPixelSize(R.dimen.status_bar_battery_icon_height_landscape_origami) : batteryHeight;
         int batteryWidth = mBatteryStyle == BATTERY_STYLE_CIRCLE || mBatteryStyle == BATTERY_STYLE_DOTTED_CIRCLE
                 || mBatteryStyle == BATTERY_STYLE_FULL_CIRCLE ?
                 getResources().getDimensionPixelSize(R.dimen.status_bar_battery_icon_circle_width) :
                 getResources().getDimensionPixelSize(R.dimen.status_bar_battery_icon_width);
+        batteryWidth = mBatteryStyle == BATTERY_STYLE_LANDSCAPE_ORIGAMI ?
+                getResources().getDimensionPixelSize(R.dimen.status_bar_battery_icon_width_landscape_origami) : batteryWidth;
 
         final MarginLayoutParams mlp = new MarginLayoutParams(batteryWidth, batteryHeight);
         mlp.setMargins(0, 0, 0,
@@ -850,6 +859,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver ,Tune
             mLandscapeBatteryM.setBatteryLevel(mLevel);
             mLandscapeBatteryN.setBatteryLevel(mLevel);
             mLandscapeBatteryO.setBatteryLevel(mLevel);
+            mLandscapeDrawableOrigami.setBatteryLevel(level);
             updatePercentText();
         }
         if (mPluggedIn != pluggedIn) {
@@ -876,6 +886,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver ,Tune
             mLandscapeBatteryM.setCharging(mPluggedIn);
             mLandscapeBatteryN.setCharging(mPluggedIn);
             mLandscapeBatteryO.setCharging(mPluggedIn);
+            mLandscapeDrawableOrigami.setCharging(isCharging());
             updateShowPercent();
             updatePercentText();
             updateChargingIconView();
@@ -904,6 +915,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver ,Tune
         mLandscapeBatteryM.setPowerSaveEnabled(isPowerSave);
         mLandscapeBatteryN.setPowerSaveEnabled(isPowerSave);
         mLandscapeBatteryO.setPowerSaveEnabled(isPowerSave);
+        mLandscapeDrawableOrigami.setPowerSaveEnabled(isPowerSave);
     }
 
     void onIsBatteryDefenderChanged(boolean isBatteryDefender) {
@@ -1111,6 +1123,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver ,Tune
         mFullCircleDrawable.setShowPercent(drawPercentInside);
         mRLandscapeDrawable.setShowPercent(drawPercentInside);
         mLandscapeDrawable.setShowPercent(drawPercentInside);
+        mLandscapeDrawableOrigami.setShowPercent(drawPercentInside);
 
         if (showPercent || (mBatteryPercentCharging && isCharging())
                 || mShowPercentMode == MODE_ESTIMATE) {
@@ -1470,6 +1483,11 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver ,Tune
             case BATTERY_STYLE_LANDSCAPEO:
                 mBatteryIconView.setImageDrawable(mLandscapeBatteryO);
                 break;
+            case BATTERY_STYLE_LANDSCAPE_ORIGAMI:
+                mBatteryIconView.setImageDrawable(mLandscapeDrawableOrigami);
+                mBatteryIconView.setVisibility(View.VISIBLE);
+                scaleBatteryMeterViews();
+                break;
             case BATTERY_STYLE_HIDDEN:
             case BATTERY_STYLE_TEXT:
                 return;
@@ -1523,6 +1541,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver ,Tune
         mLandscapeBatteryM.setColors(foregroundColor, backgroundColor, singleToneColor);
         mLandscapeBatteryN.setColors(foregroundColor, backgroundColor, singleToneColor);
         mLandscapeBatteryO.setColors(foregroundColor, backgroundColor, singleToneColor);
+        mLandscapeDrawableOrigami.setColors(foregroundColor,backgroundColor, singleToneColor);
         mTextColor = singleToneColor;
         if (mBatteryPercentView != null) {
             mBatteryPercentView.setTextColor(singleToneColor);
