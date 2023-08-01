@@ -6267,6 +6267,13 @@ public final class Settings {
          * @hide
          */
         public static final String LIVE_DISPLAY_HINTED = "live_display_hinted";
+
+        /**
+         * QS panel tile haptics intensity
+         * @hide
+         */
+        @Readable
+        public static final String QS_PANEL_TILE_HAPTIC = "qs_panel_tile_haptic";
         
         /**
          * Whether charging control should be enabled.
