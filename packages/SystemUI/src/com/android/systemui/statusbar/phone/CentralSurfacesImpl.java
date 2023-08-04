@@ -3091,27 +3091,35 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces, Tune
 
     @Override
     public void onTuningChanged(String key, String newValue) {
-        if (NAVIGATION_BAR_SHOW.equals(key) && mDisplayId == Display.DEFAULT_DISPLAY &&
-                mWindowManagerService != null) {
-            boolean navbarEnabled = NavbarUtils.isEnabled(mContext);
-            boolean hasNavbar = getNavigationBarView() != null;
-            if (navbarEnabled) {
-                if (!hasNavbar) {
-                    RegisterStatusBarResult result = null;
-                    try {
-                        result = mBarService.registerStatusBar(mCommandQueue);
-                    } catch (RemoteException ex) {
-                        ex.rethrowFromSystemServer();
+        switch (key) {
+            case NAVIGATION_BAR_SHOW:
+                if (mDisplayId != Display.DEFAULT_DISPLAY
+                    || mWindowManagerService == null) {
+                    break;
+                }
+                boolean navbarEnabled = NavbarUtils.isEnabled(mContext);
+                boolean hasNavbar = getNavigationBarView() != null;
+                if (navbarEnabled) {
+                    if (!hasNavbar) {
+                        RegisterStatusBarResult result = null;
+                        try {
+                            result = mBarService.registerStatusBar(mCommandQueue);
+                        } catch (RemoteException ex) {
+                            ex.rethrowFromSystemServer();
+                        }
+                        mNavigationBarController.createNavigationBars(true, result);
                     }
-                    mNavigationBarController.createNavigationBars(true, result);
+                } else {
+                    if (hasNavbar) {
+                        mNavigationBarController.removeNavigationBar(mDisplayId);
+                    }
                 }
-            } else {
-                if (hasNavbar) {
-                    mNavigationBarController.removeNavigationBar(mDisplayId);
-                }
-            }
-        } else if (DISPLAY_CUTOUT_HIDDEN.equals(key)) {
-            updateCutoutOverlay(TunerService.parseIntegerSwitch(newValue, false));
+                break;
+            case DISPLAY_CUTOUT_HIDDEN:
+                updateCutoutOverlay(TunerService.parseIntegerSwitch(newValue, false));
+                break;
+            default:
+                break;
         }
     }
 
