@@ -85,11 +85,6 @@ public class PixelPropsUtils {
             "com.gameloft.android.ANMP.GloftA9HM"
     };
 
-    private static final Map<String, Object> propsToChangeK30U;
-    private static final String[] packagesToChangeK30U = {
-            "com.pubg.imobile"
-    };
-
     private static final Map<String, Object> propsToChangeMi13pCN;
     private static final String[] packagesToChangeMi13pCN = {
             "com.tencent.tmgp.sgame",
@@ -107,6 +102,7 @@ public class PixelPropsUtils {
     private static final String[] packagesToChangeOP8P = {
             "com.netease.lztgglobal",
             "com.tencent.ig",
+            "com.pubg.imobile",
             "com.pubg.krmobile",
             "com.vng.pubgmobile",
             "com.rekoo.pubgm",
@@ -226,9 +222,6 @@ public class PixelPropsUtils {
         propsToChangeF4 = new HashMap<>();
         propsToChangeF4.put("MODEL", "22021211RG");
         propsToChangeF4.put("MANUFACTURER", "Xiaomi");
-        propsToChangeK30U = new HashMap<>();
-        propsToChangeK30U.put("MODEL", "M2006J10C");
-        propsToChangeK30U.put("MANUFACTURER", "Xiaomi");
         propsToChangeMi13pCN = new HashMap<>();
         propsToChangeMi13pCN.put("MODEL", "2210132C");
         propsToChangeMi13pCN.put("MANUFACTURER", "Xiaomi");
@@ -238,7 +231,7 @@ public class PixelPropsUtils {
         return packageName.startsWith("com.google.android.GoogleCamera") ||
                 Arrays.asList(customGoogleCameraPackages).contains(packageName);
     }
-    
+
     public static boolean setPropsForGms(String packageName) {
         if (packageName.equals("com.android.vending")) {
             sIsFinsky = true;
@@ -317,8 +310,6 @@ public class PixelPropsUtils {
                     propsToChange.putAll(propsToChangePixel5);
                 }
             }
-        } else if (Arrays.asList(packagesToChangeK30U).contains(packageName)) {
-            propsToChange.putAll(propsToChangeK30U);
         } else if (Arrays.asList(packagesToChangeMi13pCN).contains(packageName)) {
             propsToChange.putAll(propsToChangeMi13pCN);
         } else if (Arrays.asList(packagesToChangeROG6).contains(packageName)) {
