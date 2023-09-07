@@ -425,7 +425,7 @@ public class ViewConfiguration {
         mMaximumDrawingCacheSize = MAXIMUM_DRAWING_CACHE_SIZE;
         mOverscrollDistance = OVERSCROLL_DISTANCE;
         mOverflingDistance = OVERFLING_DISTANCE;
-        mFadingMarqueeEnabled = true;
+        mFadingMarqueeEnabled = false;
         mGlobalActionsKeyTimeout = GLOBAL_ACTIONS_KEY_TIMEOUT;
         mHorizontalScrollFactor = HORIZONTAL_SCROLL_FACTOR;
         mVerticalScrollFactor = VERTICAL_SCROLL_FACTOR;
@@ -515,8 +515,7 @@ public class ViewConfiguration {
             }
         }
 
-        mFadingMarqueeEnabled = res.getBoolean(
-                com.android.internal.R.bool.config_ui_enableFadingMarquee);
+        mFadingMarqueeEnabled = false;
         mTouchSlop = res.getDimensionPixelSize(
                 com.android.internal.R.dimen.config_viewConfigurationTouchSlop);
         mHandwritingSlop = res.getDimensionPixelSize(
