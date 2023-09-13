@@ -136,4 +136,7 @@
     <java-symbol type="string" name="charging_control_notification_content_limit_reached" />
     <java-symbol type="string" name="charging_control_notification_content_target" />
     <java-symbol type="string" name="charging_control_notification_content_target_reached" />
+    
+    <!-- Whether to enable Lineage Health Service -->
+    <java-symbol type="bool" name="config_lineageHealthSupported" />
 </resources>
