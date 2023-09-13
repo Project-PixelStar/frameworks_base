@@ -19,7 +19,6 @@ cc_library_shared {
     name: "libandroid_runtime",
     host_supported: true,
     cflags: [
-        "-O3",
         "-Wno-unused-parameter",
         "-Wno-non-virtual-dtor",
         "-Wno-maybe-uninitialized",
@@ -37,7 +36,7 @@ cc_library_shared {
         "-Wunreachable-code",
     ],
 
-    cppflags: ["-Wno-conversion-null", "-O3"],
+    cppflags: ["-Wno-conversion-null"],
 
     srcs: [
         "android_animation_PropertyValuesHolder.cpp",
