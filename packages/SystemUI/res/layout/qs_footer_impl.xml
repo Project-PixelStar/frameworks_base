@@ -73,9 +73,8 @@
                     android:clickable="true"
                     android:contentDescription="@string/accessibility_quick_settings_edit"
                     android:focusable="true"
-                    android:padding="@dimen/qs_footer_icon_padding"
-                    android:src="@*android:drawable/ic_mode_edit"
-                    android:tint="?android:attr/textColorPrimary" />
+                    android:padding="12dp"
+                    android:src="@*android:drawable/custom_edit"/>
             </FrameLayout>
 
         </LinearLayout>
