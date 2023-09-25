@@ -72,7 +72,7 @@
                     android:clickable="true"
                     android:contentDescription="@string/accessibility_quick_settings_edit"
                     android:focusable="true"
-                    android:padding="12dp"
+                    android:padding="10dp"
                     android:src="@*android:drawable/custom_edit"/>
             </FrameLayout>
 

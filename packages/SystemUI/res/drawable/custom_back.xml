@@ -17,7 +17,7 @@
         <com.android.settingslib.widget.AdaptiveIconShapeDrawable
             android:width="30dp"
             android:height="30dp"
-            android:color="@color/dashboard_bg_404" />
+            android:color="@android:color/system_accent1_100" />
     </item>
     <item
         android:width="20dp"
