@@ -22,7 +22,6 @@ cc_binary_host {
         "-Wall",
         "-Werror",
         "-Wextra",
-        "-O3",
     ],
 
     static_libs: [
