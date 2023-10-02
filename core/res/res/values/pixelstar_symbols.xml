@@ -173,4 +173,9 @@
     
     <!-- Enable face auth only when swiping security view -->
     <java-symbol type="bool" name="config_faceAuthOnlyOnSecurityView" />
+
+    <!-- Status bar DT2S gesture -->
+    <java-symbol type="bool" name="config_dt2sGestureAvailable" />
+    <java-symbol type="bool" name="config_dt2sGestureEnabledByDefault" />
+
 </resources>
