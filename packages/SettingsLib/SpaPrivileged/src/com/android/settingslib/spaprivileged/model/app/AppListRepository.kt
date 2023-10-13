@@ -114,12 +114,16 @@ class AppListRepositoryImpl(
             PackageManager.MATCH_DISABLED_UNTIL_USED_COMPONENTS).toLong()
         val archivedPackagesFlag: Long = if (isArchivingEnabled(featureFlags))
             PackageManager.MATCH_ARCHIVED_PACKAGES else 0L
+        val uninstalledPackagesFlag: Long = (PackageManager.MATCH_UNINSTALLED_PACKAGES).toLong()
         val regularFlags = ApplicationInfoFlags.of(
             disabledComponentsFlag or
-                archivedPackagesFlag
+                archivedPackagesFlag or
+                    uninstalledPackagesFlag
         )
         return if (!matchAnyUserForAdmin || !userManager.getUserInfo(userId).isAdmin) {
-            packageManager.getInstalledApplicationsAsUser(regularFlags, userId)
+            packageManager.getInstalledApplicationsAsUser(regularFlags, userId).filter {
+                it.installed
+            }
         } else {
             coroutineScope {
                 val deferredPackageNamesInChildProfiles =
