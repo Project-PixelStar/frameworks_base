@@ -35,6 +35,11 @@ public class KeyboardShortcutsReceiver extends BroadcastReceiver {
     @Inject
     public KeyboardShortcutsReceiver(FeatureFlags featureFlags) {
         mFeatureFlags = featureFlags;
+        mIsShortcutListSearchEnabled = true;
+    }
+
+    public KeyboardShortcutsReceiver() {
+        mIsShortcutListSearchEnabled = true;
     }
 
     @Override
