@@ -6334,6 +6334,12 @@ public final class Settings {
          * @hide
          */
         public static final String ENABLE_RIPPLE_EFFECT = "enable_ripple_effect";
+        
+        /**
+         * Stores the array name of the values currently used for SpoofBuildGms
+         * @hide
+         */
+        public static final String PPU_SPOOF_BUILD_GMS_ARRAY = "ppu_spoof_build_gms_array";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to
