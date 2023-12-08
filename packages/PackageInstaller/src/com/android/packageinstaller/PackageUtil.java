@@ -31,7 +31,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -131,12 +130,8 @@ public class PackageUtil {
 
         private AppSnippet(Parcel in) {
             label = in.readString();
-            try {
-                Bitmap bmp = in.readParcelable(getClass().getClassLoader(), Bitmap.class);
-                icon = new BitmapDrawable(Resources.getSystem(), bmp);
-            } catch (BadParcelableException e) {
-                // normal, no icon
-            }
+            Bitmap bmp = in.readParcelable(getClass().getClassLoader(), Bitmap.class);
+            icon = new BitmapDrawable(Resources.getSystem(), bmp);
         }
 
         @Override
@@ -153,18 +148,27 @@ public class PackageUtil {
         public void writeToParcel(@NonNull Parcel dest, int flags) {
             dest.writeString(label.toString());
             Bitmap bmp = getBitmapFromDrawable(icon);
-            if (bmp == null || bmp.getByteCount() >= 1000000 /* 1 MB */) {
-                return;
-            }
             dest.writeParcelable(bmp, 0);
         }
 
         private Bitmap getBitmapFromDrawable(Drawable drawable) {
-            if (drawable == null) return null;
-            // Create an empty bitmap with the dimensions of our drawable
-            final int h = drawable.getIntrinsicHeight();
-            final int w = drawable.getIntrinsicWidth();
-            if (h == 0 || w == 0) return null;
+            int origW = drawable.getIntrinsicWidth();
+            int origH = drawable.getIntrinsicHeight();
+
+            // resulting bitmap will be transferred over binder, which limits safe transcation size
+            // to few 100 KiB
+            final int maxSide = 250; // 250 KB at 4 bytes per pixel
+
+            int w = origW;
+            int h = origH;
+            if (Math.max(origW, origH) > maxSide) {
+                double ratio = Math.min((double) maxSide / origW, (double) maxSide / origH);
+                w = (int) (ratio * w);
+                h = (int) (ratio * h);
+                Log.d("AppSnippet", "getBitmapFromDrawable: downscaling, " +
+                        "origW " + origW + " origH " + origH + " scaleRatio " + ratio + " label " + label);
+            }
+
             final Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
             // Associate it with a canvas. This canvas will draw the icon on the bitmap
             final Canvas canvas = new Canvas(bmp);
