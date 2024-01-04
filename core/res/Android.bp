@@ -164,6 +164,10 @@ android_app {
         "com.android.window.flags.window-aconfig",
         "android.permission.flags-aconfig",
     ],
+
+    required: [
+        "org.lineageos.platform-res",
+    ],
 }
 
 java_genrule {
