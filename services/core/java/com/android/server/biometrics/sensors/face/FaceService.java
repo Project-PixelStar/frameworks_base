@@ -668,24 +668,36 @@ public class FaceService extends SystemService {
 
         private List<ServiceProvider> getSenseProviders() {
             final List<ServiceProvider> providers = new ArrayList<>();
-            if (SenseUtils.canUseProvider()) {
-                FaceSensorPropertiesInternal props = new FaceSensorPropertiesInternal(
-                        SenseProvider.DEVICE_ID,
-                        SensorProperties.STRENGTH_WEAK,
-                        1, /** maxEnrollmentsPerUser **/
-                        new ArrayList(),
-                        FaceSensorProperties.TYPE_RGB,
-                        false, /** supportsFaceDetection **/
-                        false, /** supportsSelfIllumination **/
-                        false); /** resetLockoutRequiresChallenge **/
-                SenseProvider provider = new SenseProvider(getContext(), mBiometricStateCallback, props, mLockoutResetDispatcher);
-                providers.add(provider);
-            }
+            FaceSensorPropertiesInternal props = new FaceSensorPropertiesInternal(
+                    SenseProvider.DEVICE_ID,
+                    SensorProperties.STRENGTH_WEAK,
+                    1, /** maxEnrollmentsPerUser **/
+                    new ArrayList(),
+                    FaceSensorProperties.TYPE_RGB,
+                    false, /** supportsFaceDetection **/
+                    false, /** supportsSelfIllumination **/
+                    false); /** resetLockoutRequiresChallenge **/
+            SenseProvider provider = new SenseProvider(getContext(), mBiometricStateCallback, props, mLockoutResetDispatcher);
+            providers.add(provider);
             return providers;
         }
 
         @android.annotation.EnforcePermission(android.Manifest.permission.USE_BIOMETRIC_INTERNAL)
         public void registerAuthenticators(
+
+                final List<ServiceProvider> providers = new ArrayList<>();
+                if (SenseUtils.canUseProvider()) {
+                    providers.addAll(getSenseProviders());
+                    return providers;
+                }
+                providers.addAll(getHidlProviders(filteredInstances.first));
+                providers.addAll(getAidlProviders(filteredInstances.second));
+                return providers;
+            });
+        }
+
+        @android.annotation.EnforcePermission(android.Manifest.permission.USE_BIOMETRIC_INTERNAL)
+        public void registerAuthenticatorsLegacy(
                 FaceSensorConfigurations faceSensorConfigurations) {
             super.registerAuthenticators_enforcePermission();
 
