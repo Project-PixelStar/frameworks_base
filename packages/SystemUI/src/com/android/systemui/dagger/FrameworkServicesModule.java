@@ -92,6 +92,7 @@ import android.telephony.CarrierConfigManager;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.telephony.satellite.SatelliteManager;
+import android.telephony.ims.ImsManager;
 import android.view.Choreographer;
 import android.view.CrossWindowBlurListeners;
 import android.view.IWindowManager;
@@ -725,5 +726,11 @@ public class FrameworkServicesModule {
     @Singleton
     public TaskHelper provideTaskHelper(Context context) {
         return new TaskHelper(context);
+    }
+
+    @Provides
+    @Singleton
+    static ImsManager provideImsManager(Context context) {
+        return context.getSystemService(ImsManager.class);
     }
 }
