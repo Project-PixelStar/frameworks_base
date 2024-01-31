@@ -16,15 +16,11 @@
 
 package com.android.systemui.statusbar.pipeline.wifi.data.repository.prod
 
-import android.annotation.SuppressLint
-import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.telephony.SubscriptionManager.INVALID_SUBSCRIPTION_ID
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import com.android.internal.annotations.VisibleForTesting
-import com.android.systemui.common.coroutine.ConflatedCallbackFlow.conflatedCallbackFlow
 import com.android.systemui.dagger.SysUISingleton
 import com.android.systemui.dagger.qualifiers.Application
 import com.android.systemui.dagger.qualifiers.Background
@@ -36,16 +32,17 @@ import com.android.systemui.log.core.LogLevel
 import com.android.systemui.log.table.TableLogBuffer
 import com.android.systemui.log.table.logDiffsForTable
 import com.android.systemui.statusbar.connectivity.WifiPickerTrackerFactory
-import com.android.systemui.statusbar.pipeline.dagger.WifiInputLog
-import com.android.systemui.statusbar.pipeline.dagger.WifiTableLog
+import com.android.systemui.statusbar.pipeline.dagger.WifiTrackerLibInputLog
+import com.android.systemui.statusbar.pipeline.dagger.WifiTrackerLibTableLog
 import com.android.systemui.statusbar.pipeline.ims.data.model.ImsStateModel
 import com.android.systemui.statusbar.pipeline.ims.data.repository.CommonImsRepository
 import com.android.systemui.statusbar.pipeline.shared.data.model.DataActivityModel
-import com.android.systemui.statusbar.pipeline.shared.data.model.toWifiDataActivityModel
-import com.android.systemui.statusbar.pipeline.wifi.data.repository.RealWifiRepository
 import com.android.systemui.statusbar.pipeline.wifi.data.repository.WifiRepository.Companion.CARRIER_MERGED_INVALID_SUB_ID_REASON
 import com.android.systemui.statusbar.pipeline.wifi.data.repository.WifiRepository.Companion.COL_NAME_IS_DEFAULT
 import com.android.systemui.statusbar.pipeline.wifi.data.repository.WifiRepository.Companion.COL_NAME_IS_ENABLED
+import com.android.systemui.statusbar.pipeline.wifi.data.repository.WifiRepositoryViaTrackerLibDagger
+import com.android.systemui.statusbar.pipeline.wifi.data.repository.prod.WifiRepositoryImpl.Companion.WIFI_NETWORK_DEFAULT
+import com.android.systemui.statusbar.pipeline.wifi.data.repository.prod.WifiRepositoryImpl.Companion.WIFI_STATE_DEFAULT
 import com.android.systemui.statusbar.pipeline.wifi.shared.model.WifiNetworkModel
 import com.android.systemui.statusbar.pipeline.wifi.shared.model.WifiNetworkModel.Inactive.toHotspotDeviceType
 import com.android.systemui.statusbar.pipeline.wifi.shared.model.WifiScanEntry
@@ -60,7 +57,6 @@ import java.util.concurrent.Executor
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -70,11 +66,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 /**
- * A real implementation of [WifiRepository] that uses [com.android.wifitrackerlib] as the source of
+ * An implementation of [WifiRepository] that uses [com.android.wifitrackerlib] as the source of
  * truth for wifi information.
+ *
+ * Serves as a possible replacement for [WifiRepositoryImpl]. See b/292534484.
  */
 @SysUISingleton
-class WifiRepositoryImpl
+class WifiRepositoryViaTrackerLib
 @Inject
 constructor(
     featureFlags: FeatureFlags,
@@ -83,11 +81,10 @@ constructor(
     @Background private val bgDispatcher: CoroutineDispatcher,
     private val wifiPickerTrackerFactory: WifiPickerTrackerFactory,
     private val wifiManager: WifiManager,
-    @WifiInputLog private val inputLogger: LogBuffer,
-    @WifiTableLog private val tableLogger: TableLogBuffer,
-) : RealWifiRepository, LifecycleOwner {
+    @WifiTrackerLibInputLog private val inputLogger: LogBuffer,
+    @WifiTrackerLibTableLog private val wifiTrackerLibTableLogBuffer: TableLogBuffer,
     private val commonImsRepo: CommonImsRepository,
-) : WifiRepositoryDagger {
+) : WifiRepositoryViaTrackerLibDagger, LifecycleOwner {
 
     override val lifecycle =
         LifecycleRegistry(this).also {
@@ -192,7 +189,7 @@ constructor(
             .map { it.state == WifiManager.WIFI_STATE_ENABLED }
             .distinctUntilChanged()
             .logDiffsForTable(
-                tableLogger,
+                wifiTrackerLibTableLogBuffer,
                 columnPrefix = "",
                 columnName = COL_NAME_IS_ENABLED,
                 initialValue = false,
@@ -204,7 +201,7 @@ constructor(
             .map { it.primaryNetwork }
             .distinctUntilChanged()
             .logDiffsForTable(
-                tableLogger,
+                wifiTrackerLibTableLogBuffer,
                 columnPrefix = "",
                 initialValue = WIFI_NETWORK_DEFAULT,
             )
@@ -215,7 +212,7 @@ constructor(
             .map { it.secondaryNetworks }
             .distinctUntilChanged()
             .logDiffsForTable(
-                tableLogger,
+                wifiTrackerLibTableLogBuffer,
                 columnPrefix = "",
                 columnName = "secondaryNetworks",
                 initialValue = emptyList(),
@@ -309,7 +306,7 @@ constructor(
             .map { it.isDefault }
             .distinctUntilChanged()
             .logDiffsForTable(
-                tableLogger,
+                wifiTrackerLibTableLogBuffer,
                 columnPrefix = "",
                 columnName = COL_NAME_IS_DEFAULT,
                 initialValue = false,
@@ -317,49 +314,23 @@ constructor(
             .stateIn(scope, SharingStarted.Eagerly, false)
 
     override val wifiActivity: StateFlow<DataActivityModel> =
-        conflatedCallbackFlow {
-                val callback =
-                    WifiManager.TrafficStateCallback { state ->
-                        logActivity(state)
-                        trySend(state.toWifiDataActivityModel())
-                    }
-                wifiManager.registerTrafficStateCallback(mainExecutor, callback)
-                awaitClose { wifiManager.unregisterTrafficStateCallback(callback) }
-            }
-            .stateIn(
-                scope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = ACTIVITY_DEFAULT,
-            )
+        WifiRepositoryHelper.createActivityFlow(
+            wifiManager,
+            mainExecutor,
+            scope,
+            wifiTrackerLibTableLogBuffer,
+            this::logActivity,
+        )
 
     override val wifiScanResults: StateFlow<List<WifiScanEntry>> =
-        conflatedCallbackFlow {
-                val callback =
-                    object : WifiManager.ScanResultsCallback() {
-                        @SuppressLint("MissingPermission")
-                        override fun onScanResultsAvailable() {
-                            logScanResults()
-                            trySend(wifiManager.scanResults.toModel())
-                        }
-                    }
+        WifiRepositoryHelper.createNetworkScanFlow(
+            wifiManager,
+            scope,
+            bgDispatcher,
+            this::logScanResults,
+        )
 
-                wifiManager.registerScanResultsCallback(bgDispatcher.asExecutor(), callback)
     override val imsStates: StateFlow<List<ImsStateModel>> = commonImsRepo.imsStates
-
-    companion object {
-        // Start out with no known wifi network.
-        // Note: [WifiStatusTracker] (the old implementation of connectivity logic) does do an
-        // initial fetch to get a starting wifi network. But, it uses a deprecated API
-        // [WifiManager.getConnectionInfo()], and the deprecation doc indicates to just use
-        // [ConnectivityManager.NetworkCallback] results instead. So, for now we'll just rely on the
-        // NetworkCallback inside [wifiNetwork] for our wifi network information.
-        val WIFI_NETWORK_DEFAULT = WifiNetworkModel.Inactive
-
-                awaitClose { wifiManager.unregisterScanResultsCallback(callback) }
-            }
-            .stateIn(scope, SharingStarted.Eagerly, emptyList())
-
-    private fun List<ScanResult>.toModel(): List<WifiScanEntry> = map { WifiScanEntry(it.SSID) }
 
     private fun logOnWifiEntriesChanged(connectedEntry: WifiEntry?) {
         inputLogger.log(
@@ -379,24 +350,8 @@ constructor(
         )
     }
 
-    private fun logActivity(activity: Int) {
-        inputLogger.log(
-            TAG,
-            LogLevel.DEBUG,
-            { str1 = prettyPrintActivity(activity) },
-            { "onActivityChanged: $str1" }
-        )
-    }
-
-    // TODO(b/292534484): This print should only be done in [MessagePrinter] part of the log buffer.
-    private fun prettyPrintActivity(activity: Int): String {
-        return when (activity) {
-            WifiManager.TrafficStateCallback.DATA_ACTIVITY_NONE -> "NONE"
-            WifiManager.TrafficStateCallback.DATA_ACTIVITY_IN -> "IN"
-            WifiManager.TrafficStateCallback.DATA_ACTIVITY_OUT -> "OUT"
-            WifiManager.TrafficStateCallback.DATA_ACTIVITY_INOUT -> "INOUT"
-            else -> "INVALID"
-        }
+    private fun logActivity(activity: String) {
+        inputLogger.log(TAG, LogLevel.DEBUG, { str1 = activity }, { "onActivityChanged: $str1" })
     }
 
     private fun logScanResults() =
@@ -427,13 +382,12 @@ constructor(
         @Main private val mainExecutor: Executor,
         @Background private val bgDispatcher: CoroutineDispatcher,
         private val wifiPickerTrackerFactory: WifiPickerTrackerFactory,
-        @WifiInputLog private val inputLogger: LogBuffer,
-        @WifiTableLog private val tableLogger: TableLogBuffer,
-        @Application private val scope: CoroutineScope,
-        private val commonImsRepository: CommonImsRepository
+        @WifiTrackerLibInputLog private val inputLogger: LogBuffer,
+        @WifiTrackerLibTableLog private val wifiTrackerLibTableLogBuffer: TableLogBuffer,
+        private val commonImsRepository: CommonImsRepository,
     ) {
-        fun create(wifiManager: WifiManager): WifiRepositoryImpl {
-            return WifiRepositoryImpl(
+        fun create(wifiManager: WifiManager): WifiRepositoryViaTrackerLib {
+            return WifiRepositoryViaTrackerLib(
                 featureFlags,
                 scope,
                 mainExecutor,
@@ -441,20 +395,13 @@ constructor(
                 wifiPickerTrackerFactory,
                 wifiManager,
                 inputLogger,
-                tableLogger,
+                wifiTrackerLibTableLogBuffer,
                 commonImsRepository,
             )
         }
     }
 
     companion object {
-        // Start out with no known wifi network.
-        @VisibleForTesting val WIFI_NETWORK_DEFAULT = WifiNetworkModel.Inactive
-
-        private const val WIFI_STATE_DEFAULT = WifiManager.WIFI_STATE_DISABLED
-
-        val ACTIVITY_DEFAULT = DataActivityModel(hasActivityIn = false, hasActivityOut = false)
-
         private const val TAG = "WifiTrackerLibInputLog"
 
         /**
@@ -467,7 +414,7 @@ constructor(
          * repository.
          *
          * The [WifiNetworkModel.Active.networkId] field should be deleted once we've fully migrated
-         * to [WifiRepositoryImpl].
+         * to [WifiRepositoryViaTrackerLib].
          */
         private const val NETWORK_ID = -1
     }
