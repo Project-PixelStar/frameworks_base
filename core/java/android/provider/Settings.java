@@ -12737,13 +12737,6 @@ public final class Settings {
         public static final String STATUS_BAR_AM_PM = "status_bar_am_pm";
 
         /**
-         * Whether to allow sensitive qs tiles on keyguard
-         * @hide
-         */
-        @Readable
-        public static final String QSTILE_REQUIRES_UNLOCKING = "qstile_requires_unlocking";
-
-        /**
          * Whether to turn off Private DNS {@link #PRIVATE_DNS_MODE}
          * when a VPN is connected
          * <p>

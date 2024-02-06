@@ -52,7 +52,6 @@ import com.android.systemui.qs.logging.QSLogger;
 import com.android.systemui.qs.tileimpl.QSTileImpl;
 import com.android.systemui.qs.tiles.dialog.BluetoothDialogFactory;
 import com.android.systemui.statusbar.policy.BluetoothController;
-import com.android.systemui.statusbar.policy.KeyguardStateController;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -60,8 +59,10 @@ import java.util.concurrent.Executor;
 import javax.inject.Inject;
 
 /** Quick settings tile: Bluetooth **/
-public class BluetoothTile extends SecureQSTile<BooleanState> {
+public class BluetoothTile extends QSTileImpl<BooleanState> {
+
     public static final String TILE_SPEC = "bt";
+
     private static final Intent BLUETOOTH_SETTINGS = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
 
     private static final String TAG = BluetoothTile.class.getSimpleName();
@@ -86,11 +87,10 @@ public class BluetoothTile extends SecureQSTile<BooleanState> {
             ActivityStarter activityStarter,
             QSLogger qsLogger,
             BluetoothController bluetoothController,
-            KeyguardStateController keyguardStateController,
             BluetoothDialogFactory bluetoothDialogFactory
     ) {
         super(host, uiEventLogger, backgroundLooper, mainHandler, falsingManager, metricsLogger,
-                statusBarStateController, activityStarter, qsLogger, keyguardStateController);
+                statusBarStateController, activityStarter, qsLogger);
         mHandler = mainHandler;
         mController = bluetoothController;
         mBluetoothDialogFactory = bluetoothDialogFactory;
@@ -106,11 +106,7 @@ public class BluetoothTile extends SecureQSTile<BooleanState> {
     }
 
     @Override
-    protected void handleClick(@Nullable View view, boolean keyguardShowing) {
-        if (checkKeyguard(view, keyguardShowing)) {
-            return;
-        }
-
+    protected void handleClick(@Nullable View view) {
         // Secondary clicks are header clicks, just toggle.
         final boolean isEnabled = mState.value;
         // Immediately enter transient enabling state when turning bluetooth on.
