@@ -12678,6 +12678,13 @@ public final class Settings {
         public static final String QS_SHOW_DATA_USAGE = "qs_show_data_usage";
 
         /**
+         * Control whether to spoof current status of storage encryption.
+         * @hide
+         */
+        @Readable
+        public static final String SPOOF_STORAGE_ENCRYPTION_STATUS = "spoof_storage_encryption_status";
+
+        /**
          * These entries are considered common between the personal and the managed profile,
          * since the managed profile doesn't get to change them.
          */
