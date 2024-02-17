@@ -365,6 +365,8 @@ constructor(
                 Settings.Global.ANIMATOR_DURATION_SCALE
             ) == "0"
         ) {
+        if (Settings.Global.getFloat(
+                context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE) == 0f) {
             return false
         }
 
