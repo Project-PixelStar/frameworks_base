@@ -104,14 +104,14 @@ public class CustomUtils {
     }
 
     // Check to see if a package is installed
-    public static boolean isPackageInstalled(Context context, String pkg, boolean ignoreState) {
-        if (pkg != null) {
+    public static boolean isPackageInstalled(Context context, String packageName, boolean ignoreState) {
+        if (packageName != null) {
             try {
-                PackageInfo pi = context.getPackageManager().getPackageInfo(pkg, 0);
-                if (!pi.applicationInfo.enabled && !ignoreState) {
+                PackageInfo pi = context.getPackageManager().getPackageInfo(packageName, 0);
+                if ((!pi.applicationInfo.enabled || !pi.applicationInfo.isProduct()) && !ignoreState) {
                     return false;
                 }
-            } catch (NameNotFoundException e) {
+            } catch (PackageManager.NameNotFoundException e) {
                 return false;
             }
         }
@@ -119,8 +119,8 @@ public class CustomUtils {
         return true;
     }
 
-    public static boolean isPackageInstalled(Context context, String pkg) {
-        return isPackageInstalled(context, pkg, true);
+    public static boolean isPackageInstalled(Context context, String packageName) {
+        return isPackageInstalled(context, packageName, true);
     }
 
     public static List<String> launchablePackages(Context context) {
