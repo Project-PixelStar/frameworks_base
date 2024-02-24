@@ -6351,12 +6351,6 @@ public final class Settings {
          */
         @Readable
         public static final String VOLUME_SLIDER_HAPTICS_INTENSITY = "volume_slider_haptics_intensity";
-
-        /**
-         * Whether to enable the ripple animation on fingerprint unlock
-         * @hide
-         */
-        public static final String ENABLE_RIPPLE_EFFECT = "enable_ripple_effect";
         
         /**
          * Stores the array name of the values currently used for SpoofBuildGms
