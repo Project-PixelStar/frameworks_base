@@ -207,6 +207,40 @@ public class CompanionDeviceManagerService extends SystemService {
         // Init UUID store
         mObservableUuidStore.getObservableUuidsForUser(getContext().getUserId());
 
+        final Context context = getContext();
+
+        mPersistentStore = new PersistentDataStore();
+        mAssociationRequestsProcessor = new AssociationRequestsProcessor(
+                /* cdmService */ this, mAssociationStore);
+        mBackupRestoreProcessor = new BackupRestoreProcessor(
+                /* cdmService */ this, mAssociationStore, mPersistentStore,
+                mSystemDataTransferRequestStore, mAssociationRequestsProcessor);
+
+        mObservableUuidStore.getObservableUuidsForUser(getContext().getUserId());
+
+        mAssociationStore.registerListener(mAssociationStoreChangeListener);
+
+        mDevicePresenceMonitor = new CompanionDevicePresenceMonitor(mUserManager,
+                mAssociationStore, mObservableUuidStore, mDevicePresenceCallback);
+
+        mCompanionAppController = new CompanionApplicationController(
+                context, mAssociationStore, mObservableUuidStore, mDevicePresenceMonitor,
+                mPowerManagerInternal);
+
+        mAssociationRevokeProcessor = new AssociationRevokeProcessor(this, mAssociationStore,
+                mPackageManagerInternal, mDevicePresenceMonitor, mCompanionAppController,
+                mSystemDataTransferRequestStore);
+
+        loadAssociationsFromDisk();
+
+        mTransportManager = new CompanionTransportManager(context, mAssociationStore);
+        mSystemDataTransferProcessor = new SystemDataTransferProcessor(this,
+                mPackageManagerInternal, mAssociationStore,
+                mSystemDataTransferRequestStore, mTransportManager);
+
+        // TODO(b/279663946): move context sync to a dedicated system service
+        mCrossDeviceSyncController = new CrossDeviceSyncController(getContext(), mTransportManager);
+
         // Publish "binder" service.
         final CompanionDeviceManagerImpl impl = new CompanionDeviceManagerImpl();
         publishBinderService(Context.COMPANION_DEVICE_SERVICE, impl);
