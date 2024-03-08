@@ -39,25 +39,27 @@ import com.android.systemui.statusbar.connectivity.AccessPointController
 import com.android.systemui.statusbar.pipeline.shared.ui.binder.InternetTileBinder
 import com.android.systemui.statusbar.pipeline.shared.ui.model.InternetTileModel
 import com.android.systemui.statusbar.pipeline.shared.ui.viewmodel.InternetTileViewModel
+import com.android.systemui.statusbar.policy.KeyguardStateController;
 import javax.inject.Inject
 
 class InternetTileNewImpl
 @Inject
 constructor(
-    host: QSHost,
-    uiEventLogger: QsEventLogger,
-    @Background backgroundLooper: Looper,
-    @Main private val mainHandler: Handler,
-    falsingManager: FalsingManager,
-    metricsLogger: MetricsLogger,
-    statusBarStateController: StatusBarStateController,
-    activityStarter: ActivityStarter,
-    qsLogger: QSLogger,
-    viewModel: InternetTileViewModel,
-    private val internetDialogManager: InternetDialogManager,
-    private val accessPointController: AccessPointController,
+        host: QSHost,
+        keyguardStateController: KeyguardStateController,
+        uiEventLogger: QsEventLogger,
+        @Background backgroundLooper: Looper,
+        @Main private val mainHandler: Handler,
+        falsingManager: FalsingManager,
+        metricsLogger: MetricsLogger,
+        statusBarStateController: StatusBarStateController,
+        activityStarter: ActivityStarter,
+        qsLogger: QSLogger,
+        viewModel: InternetTileViewModel,
+        private val internetDialogManager: InternetDialogManager,
+        private val accessPointController: AccessPointController,
 ) :
-    QSTileImpl<QSTile.BooleanState>(
+    SecureQSTile<QSTile.BooleanState>(
         host,
         uiEventLogger,
         backgroundLooper,
@@ -66,7 +68,8 @@ constructor(
         metricsLogger,
         statusBarStateController,
         activityStarter,
-        qsLogger
+        qsLogger,
+        keyguardStateController,
     ) {
     private var model: InternetTileModel = viewModel.tileModel.value
 
@@ -84,7 +87,11 @@ constructor(
         return QSTile.BooleanState().also { it.forceExpandIcon = true }
     }
 
-    override fun handleClick(expandable: Expandable?) {
+    override fun handleClick(view: View?, keyguardShowing: Boolean) {
+        if (checkKeyguard(view, keyguardShowing)) {
+            return
+        }
+
         mainHandler.post {
             internetDialogManager.create(
                 aboveStatusBar = true,
