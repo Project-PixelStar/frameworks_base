@@ -28,14 +28,18 @@ import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.RippleDrawable
+import android.provider.Settings
 import android.os.Trace
+import android.os.UserHandle 
 import android.service.quicksettings.Tile
 import android.text.TextUtils
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
@@ -58,6 +62,8 @@ import com.android.systemui.qs.logging.QSLogger
 import com.android.systemui.qs.tileimpl.QSIconViewImpl.QS_ANIM_LENGTH
 import com.android.systemui.res.R
 import java.util.Objects
+
+import com.android.internal.util.android.VibrationUtils
 
 private const val TAG = "QSTileViewImpl"
 open class QSTileViewImpl @JvmOverloads constructor(
@@ -97,6 +103,14 @@ open class QSTileViewImpl @JvmOverloads constructor(
             field = value
             updateHeight()
         }
+
+    private val qsTileHaptic: Int = Settings.System.getIntForUser(
+            context.contentResolver,
+            Settings.System.QS_PANEL_TILE_HAPTIC, 0, UserHandle.USER_CURRENT
+        )
+
+    private var initialX = 0f
+    private var initialY = 0f
 
     private val colorActive = Utils.getColorAttrDefaultColor(context, R.attr.shadeActive)
     private val colorInactive = Utils.getColorAttrDefaultColor(context, R.attr.shadeInactive)
@@ -341,6 +355,24 @@ open class QSTileViewImpl @JvmOverloads constructor(
     ) {
         setOnClickListener(click)
         onLongClickListener = longClick
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                initialX = event.x
+                initialY = event.y
+            }
+            MotionEvent.ACTION_UP -> {
+                val distanceX = Math.abs(event.x - initialX)
+                val distanceY = Math.abs(event.y - initialY)
+                val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+                if (distanceX < touchSlop && distanceY < touchSlop) {
+                    VibrationUtils.triggerVibration(context, qsTileHaptic)
+                }
+            }
+        }
+        return super.onTouchEvent(event)
     }
 
     override fun onStateChanged(state: QSTile.State) {

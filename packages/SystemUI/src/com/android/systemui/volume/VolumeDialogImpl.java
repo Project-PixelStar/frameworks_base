@@ -39,6 +39,7 @@ import static com.android.internal.jank.InteractionJankMonitor.Configuration.Bui
 import static com.android.systemui.Flags.hapticVolumeSlider;
 import static com.android.systemui.volume.Events.DISMISS_REASON_POSTURE_CHANGED;
 import static com.android.systemui.volume.Events.DISMISS_REASON_SETTINGS_CLICKED;
+import com.android.internal.util.android.VibrationUtils;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -3063,6 +3064,9 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                 if (D.BUG) Log.d(TAG, "set app " + mRow.packageName + " volume to " + vol);
                 mController.getAudioManager().setAppVolume(mRow.packageName, vol);
                 updateAppVolumeRows();
+            int vibrateIntensity = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.VOLUME_SLIDER_HAPTICS_INTENSITY, 1);
+            VibrationUtils.triggerVibration(mContext, vibrateIntensity);
                 return;
             }
             if (mRow.ss == null) return;
@@ -3085,6 +3089,9 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                             userLevel);
                 }
             }
+            int vibrateIntensity = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.VOLUME_SLIDER_HAPTICS_INTENSITY, 1);
+            VibrationUtils.triggerVibration(mContext, vibrateIntensity);
         }
 
         @Override
