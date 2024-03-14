@@ -6916,6 +6916,28 @@ public final class Settings {
         public static final String VOLUME_ROCKER_WAKE = "volume_rocker_wake";
 
         /**
+         * Haptic feedback on brightness slider
+         * @hide
+         */
+        public static final String QS_BRIGHTNESS_SLIDER_HAPTIC = "qs_brightness_slider_haptic";
+
+        /**
+         * @hide
+         */
+        public static final String QS_PANEL_TILE_HAPTIC = "qs_panel_tile_haptic";
+
+        /**
+         * @hide
+         */
+        @Readable
+        public static final String EDGE_SCROLLING_HAPTICS_INTENSITY = "edge_scrolling_haptics_intensity";
+
+        /**
+         * @hide
+         */
+        public static final String VOLUME_SLIDER_HAPTICS_INTENSITY = "volume_slider_haptics_intensity";
+
+        /**
          * These are all public system settings
          *
          * @hide
@@ -13082,6 +13104,12 @@ public final class Settings {
         public static final String DOZE_ON_CHARGE = "doze_on_charge";
 
         /**
+         * Whether or not to vibrate when back gesture is used
+         * @hide
+         */
+        public static final String BACK_GESTURE_HAPTIC_INTENSITY = "back_gesture_haptic_intensity";
+
+        /**
          * Control whether to hide ADB and Developer settings enable status.
          * @hide
          */
@@ -13102,6 +13130,12 @@ public final class Settings {
          * @hide
          */
         public static final String PULSE_ON_NEW_TRACKS = "pulse_on_new_tracks";
+
+        /**
+         * Whether or not to vibrate when back gesture is used
+         * @hide
+         */
+        public static final String BACK_GESTURE_HAPTIC = "back_gesture_haptic";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to

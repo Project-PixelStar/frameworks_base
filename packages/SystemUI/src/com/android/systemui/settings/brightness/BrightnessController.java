@@ -23,7 +23,6 @@ import static com.android.settingslib.display.BrightnessUtils.convertLinearToGam
 import android.animation.ValueAnimator;
 import android.annotation.NonNull;
 import android.content.Context;
-import android.database.ContentObserver;
 import android.hardware.display.BrightnessInfo;
 import android.hardware.display.DisplayManager;
 import android.net.Uri;
@@ -36,6 +35,8 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.os.Vibrator;
+import android.os.VibrationEffect;
 import android.provider.Settings;
 import android.service.vr.IVrManager;
 import android.service.vr.IVrStateCallbacks;
@@ -56,14 +57,19 @@ import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.settings.DisplayTracker;
 import com.android.systemui.settings.UserTracker;
 import com.android.systemui.util.settings.SecureSettings;
-
+import com.android.systemui.statusbar.policy.BrightnessMirrorController;
+import com.android.systemui.tuner.TunerService;
 import dagger.assisted.Assisted;
 import dagger.assisted.AssistedFactory;
 import dagger.assisted.AssistedInject;
 
 import java.util.concurrent.Executor;
 
-public class BrightnessController implements ToggleSlider.Listener, MirroredBrightnessController {
+import com.android.internal.util.android.VibrationUtils;
+
+public class BrightnessController implements ToggleSlider.Listener, MirroredBrightnessController,
+        TunerService.Tunable {
+
     private static final String TAG = "CentralSurfaces.BrightnessController";
     private static final int SLIDER_ANIMATION_DURATION = 3000;
 
@@ -73,8 +79,10 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
     private static final int MSG_DETACH_LISTENER = 3;
     private static final int MSG_VR_MODE_CHANGED = 4;
 
-    private static final Uri BRIGHTNESS_MODE_URI =
-            Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE);
+    private static final String SCREEN_BRIGHTNESS_MODE =
+            "system:" + Settings.System.SCREEN_BRIGHTNESS_MODE;
+    private static final String QS_BRIGHTNESS_SLIDER_HAPTIC =
+            "system:" + Settings.System.QS_BRIGHTNESS_SLIDER_HAPTIC;
 
     private final ImageView mIcon;
     private final int mDisplayId;
@@ -86,11 +94,8 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
     @Nullable
     private final IVrManager mVrManager;
 
-    private final SecureSettings mSecureSettings;
-
     private final Executor mMainExecutor;
     private final Handler mBackgroundHandler;
-    private final BrightnessObserver mBrightnessObserver;
 
     private final DisplayTracker.Callback mBrightnessListener = new DisplayTracker.Callback() {
         @Override
@@ -109,6 +114,11 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
     private float mBrightnessMax = PowerManager.BRIGHTNESS_MAX;
 
     private ValueAnimator mSliderAnimator;
+
+    private Vibrator mVibrator;
+    private static final VibrationEffect BRIGHTNESS_SLIDER_HAPTIC =
+            VibrationEffect.get(VibrationEffect.EFFECT_TICK);
+    private int mBrightnessSliderHaptic;
 
     @Override
     public void setMirror(@Nullable MirrorController controller) {
@@ -151,6 +161,22 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
             mObserving = false;
         }
 
+    @Override
+    public void onTuningChanged(String key, String newValue) {
+        switch (key) {
+            case SCREEN_BRIGHTNESS_MODE:
+                if (mListening) {
+                    mBackgroundHandler.post(mUpdateModeRunnable);
+                    mBackgroundHandler.post(mUpdateSliderRunnable);
+                }
+                break;
+            case QS_BRIGHTNESS_SLIDER_HAPTIC:
+                mBrightnessSliderHaptic =
+                        TunerService.parseInteger(newValue, 0);
+                break;
+            default:
+                break;
+         }
     }
 
     private final Runnable mStartListeningRunnable = new Runnable() {
@@ -170,7 +196,6 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
                 }
             }
 
-            mBrightnessObserver.startObserving();
             mDisplayTracker.addBrightnessChangeCallback(mBrightnessListener,
                     new HandlerExecutor(mMainHandler));
             mUserTracker.addCallback(mUserChangedCallback, mMainExecutor);
@@ -200,7 +225,6 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
                 }
             }
 
-            mBrightnessObserver.stopObserving();
             mDisplayTracker.removeCallback(mBrightnessListener);
             mUserTracker.removeCallback(mUserChangedCallback);
 
@@ -304,7 +328,7 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
             UserTracker userTracker,
             DisplayTracker displayTracker,
             DisplayManager displayManager,
-            SecureSettings secureSettings,
+            TunerService tunerService,
             @Nullable IVrManager iVrManager,
             @Main Executor mainExecutor,
             @Main Looper mainLooper,
@@ -316,13 +340,16 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
         mBackgroundHandler = bgHandler;
         mUserTracker = userTracker;
         mDisplayTracker = displayTracker;
-        mSecureSettings = secureSettings;
         mDisplayId = mContext.getDisplayId();
         mDisplayManager = displayManager;
         mVrManager = iVrManager;
 
         mMainHandler = new Handler(mainLooper, mHandlerCallback);
-        mBrightnessObserver = new BrightnessObserver(mMainHandler);
+
+        mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (mVibrator == null || !mVibrator.hasVibrator()) {
+            mVibrator = null;
+        }
 
         mIcon = control.getIcon();
         mIcon.setOnClickListener(v -> Settings.System.putIntForUser(mContext.getContentResolver(),
@@ -330,6 +357,8 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
                     Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL :
                     Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC,
                 UserHandle.USER_CURRENT));
+        tunerService.addTunable(this, SCREEN_BRIGHTNESS_MODE);
+        tunerService.addTunable(this, QS_BRIGHTNESS_SLIDER_HAPTIC);
     }
 
     public void registerCallbacks() {
@@ -358,7 +387,6 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
         final float maxBacklight;
         final int metric;
 
-
         metric = mAutomatic
                 ? MetricsEvent.ACTION_BRIGHTNESS_AUTO
                 : MetricsEvent.ACTION_BRIGHTNESS;
@@ -374,6 +402,11 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
 
         }
         setBrightness(valFloat);
+
+        // Give haptic feedback only if brightness is changed manually
+        if (mBrightnessSliderHaptic > 0 && mVibrator != null && tracking)
+            VibrationUtils.triggerVibration(mContext, mBrightnessSliderHaptic);
+
         if (!tracking) {
             AsyncTask.execute(new Runnable() {
                     public void run() {
