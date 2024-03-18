@@ -6345,6 +6345,9 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
                             mBroadcastHelper.sendPackageChangedBroadcast(snapShot, packageName,
                                     true /* dontKillApp */, components, packageUid, reason);
                         }
+                        final int packageUid = UserHandle.getUid(userIds[i], appId);
+                        mBroadcastHelper.sendPackageChangedBroadcast(snapShot, packageName,
+                                true /* dontKillApp */, components, packageUid, reason);
                     }
                 });
             }
