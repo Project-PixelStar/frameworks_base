@@ -183,7 +183,7 @@ public class CellularTile extends QSTileImpl<BooleanState> {
 
         if (cb.noSim) {
             state.state = Tile.STATE_UNAVAILABLE;
-            state.secondaryLabel = r.getString(R.string.keyguard_missing_sim_message_short);
+            state.secondaryLabel = r.getString(com.android.systemui.res.R.string.keyguard_missing_sim_message_short);
         } else if (cb.airplaneModeEnabled) {
             state.state = Tile.STATE_UNAVAILABLE;
             state.secondaryLabel = r.getString(R.string.status_bar_airplane);
