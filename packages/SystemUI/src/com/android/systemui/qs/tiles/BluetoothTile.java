@@ -87,6 +87,8 @@ public class BluetoothTile extends QSTileImpl<BooleanState> {
     @Nullable
     @VisibleForTesting
     Job mClickJob;
+    
+    private boolean mBluetoothQsDialogEnabled;
 
     @Inject
     public BluetoothTile(
@@ -110,6 +112,7 @@ public class BluetoothTile extends QSTileImpl<BooleanState> {
         mExecutor = new HandlerExecutor(mainHandler);
         mFeatureFlags = featureFlags;
         mDialogViewModel = dialogViewModel;
+        mBluetoothQsDialogEnabled = mFeatureFlags.isEnabled(Flags.BLUETOOTH_QS_TILE_DIALOG);
     }
 
     @Override
@@ -148,11 +151,26 @@ public class BluetoothTile extends QSTileImpl<BooleanState> {
             refreshState(isEnabled ? null : ARG_SHOW_TRANSIENT_ENABLING);
             mController.setBluetoothEnabled(!isEnabled);
         }
+    protected void handleClick(@Nullable View view) {
+        // Secondary clicks are header clicks, just toggle.
+        final boolean isEnabled = mState.value;
+        // Immediately enter transient enabling state when turning bluetooth on.
+        refreshState(isEnabled ? null : ARG_SHOW_TRANSIENT_ENABLING);
+        mController.setBluetoothEnabled(!isEnabled);
     }
 
     @Override
     public Intent getLongClickIntent() {
-        return new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+        return mBluetoothQsDialogEnabled ? null : new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+    }
+
+    @Override
+    protected void handleLongClick(@Nullable View view) {
+        if (mBluetoothQsDialogEnabled) {
+            boolean isAutoOn = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.QS_BT_AUTO_ON, 0) == 1;
+            mDialogViewModel.showDialog(mContext, view, isAutoOn);
+        }
     }
 
     @Override
