@@ -44,6 +44,7 @@ import android.view.ViewConfiguration;
 import android.window.WindowContainerTransaction;
 
 import com.android.launcher3.icons.IconProvider;
+import com.android.internal.policy.ScreenDecorationsUtils;
 import com.android.wm.shell.R;
 import com.android.wm.shell.ShellTaskOrganizer;
 import com.android.wm.shell.common.DisplayController;
@@ -210,6 +211,9 @@ public class CaptionWindowDecoration extends WindowDecoration<WindowDecorLinearL
         mRelayoutParams.mShadowRadiusId = shadowRadiusID;
         mRelayoutParams.mApplyStartTransactionOnDraw = applyStartTransactionOnDraw;
         mRelayoutParams.mSetTaskPositionAndCrop = setTaskCropAndPosition;
+        mRelayoutParams.mAllowCaptionInputFallthrough = false;
+        mRelayoutParams.mCornerRadius =
+                (int) ScreenDecorationsUtils.getWindowCornerRadius(mContext);
 
         relayout(mRelayoutParams, startT, finishT, wct, oldRootView, mResult);
         // After this line, mTaskInfo is up-to-date and should be used instead of taskInfo
@@ -237,6 +241,7 @@ public class CaptionWindowDecoration extends WindowDecoration<WindowDecorLinearL
                     mHandler,
                     mChoreographer,
                     mDisplay.getDisplayId(),
+                    mRelayoutParams.mCornerRadius,
                     mDecorationContainerSurface,
                     mDragPositioningCallback,
                     mSurfaceControlBuilderSupplier,
