@@ -22,6 +22,7 @@ import com.android.systemui.qs.tiles.CompassTile
 import com.android.systemui.qs.tiles.HeadsUpTile
 import com.android.systemui.qs.tiles.SoundTile
 import com.android.systemui.qs.tiles.SyncTile
+<<<<<<< HEAD:packages/SystemUI/src/com/android/systemui/qs/dagger/custom/QSModuleCustom.kt
 import com.android.systemui.qs.tiles.AmbientDisplayTile
 import com.android.systemui.qs.tiles.UsbTetherTile
 import com.android.systemui.qs.tiles.AODTile
@@ -31,6 +32,8 @@ import com.android.systemui.qs.tiles.AntiFlickerTile
 import com.android.systemui.qs.tiles.SoundSearchTile
 import com.android.systemui.qs.tiles.CaffeineTile
 import com.android.systemui.qs.tiles.VolumeTile
+import com.android.systemui.qs.tiles.CellularTile
+import com.android.systemui.qs.tiles.WifiTile
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -39,6 +42,12 @@ import dagger.multibindings.StringKey
 @Module
 interface QSModuleCustom {
 
+    /** Inject CellularTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(CellularTile.TILE_SPEC)
+    fun bindCellularTile(cellularTile: CellularTile): QSTileImpl<*>
+    
     /** Inject PowerShareTile into tileMap in QSModule */
     @Binds
     @IntoMap
@@ -121,4 +130,10 @@ interface QSModuleCustom {
     @IntoMap
     @StringKey(SoundSearchTile.TILE_SPEC)
     fun bindSoundSearchTile(soundSearchTile: SoundSearchTile): QSTileImpl<*>
+
+    /** Inject WifiTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(WifiTile.TILE_SPEC)
+    fun bindWifiTile(wifiTile: WifiTile): QSTileImpl<*>
 }
