@@ -235,7 +235,7 @@ public class QSPanel extends LinearLayout implements Tunable {
         }
     }
 
-    private void setBrightnessViewMargin(boolean top) {
+    protected void setBrightnessViewMargin(boolean top) {
         if (mBrightnessView != null) {
             MarginLayoutParams lp = (MarginLayoutParams) mBrightnessView.getLayoutParams();
             // For Brightness Slider to extend its boundary to draw focus background
