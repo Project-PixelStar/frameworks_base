@@ -73,7 +73,9 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
     public static final int REQUEST_CODE = 2;
 
     private static final int USER_ID_NOT_SPECIFIED = -1;
-    protected static final int NOTIF_BASE_ID = 4273;
+    private static final int NOTIF_BASE_ID = 4273;
+    private static final int PROGRESS_NOTIF_ID = 4274;
+    private static final int ERROR_NOTIF_ID = 4275;
     private static final String TAG = "RecordingService";
     private static final String CHANNEL_ID = "screen_record";
     private static final String GROUP_KEY = "screen_record_saved";
@@ -286,6 +288,9 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
                 // Remove notification
                 mNotificationManager.cancelAsUser(null, NOTIF_BASE_ID, currentUser);
                 Log.d(TAG, "Deleted recording " + uri);
+
+                // Close quick shade
+                maybeCloseSystemDialogs();
                 break;
             case ACTION_SHOW_DIALOG:
                 if (mController != null) {
@@ -360,7 +365,7 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
                 .setSmallIcon(R.drawable.ic_screenrecord)
                 .setContentTitle(notificationTitle)
                 .addExtras(extras);
-        startForeground(mNotificationId, builder.build());
+        startForeground(ERROR_NOTIF_ID, builder.build());
     }
 
     @VisibleForTesting
@@ -396,7 +401,7 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
                 .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
                 .addAction(stopAction)
                 .addExtras(extras);
-        startForeground(mNotificationId, builder.build());
+        startForeground(PROGRESS_NOTIF_ID, builder.build());
     }
 
     @VisibleForTesting
@@ -480,6 +485,8 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
      * grouped together, and the foreground service recording notification is not
      */
     private void postGroupNotification(UserHandle currentUser) {
+        if (countGroupNotifications() < 1)
+            return; // only post after we show the 2nd notification
         Bundle extras = new Bundle();
         extras.putString(Notification.EXTRA_SUBSTITUTE_APP_NAME,
                 strings().getTitle());
@@ -491,6 +498,29 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
                 .setExtras(extras)
                 .build();
         mNotificationManager.notifyAsUser(getTag(), NOTIF_BASE_ID, groupNotif, currentUser);
+    }
+
+    private void maybeDismissGroup(UserHandle currentUser) {
+        if (countGroupNotifications() >= 1)
+            return; // dismiss only when we have one notification left
+        mNotificationManager.cancelAsUser(TAG, NOTIF_BASE_ID, currentUser);
+    }
+
+    private void maybeCloseSystemDialogs() {
+        if (countGroupNotifications() > 0)
+            return; // only dismiss when we cancel the last group notification
+        closeSystemDialogs();
+    }
+
+    private int countGroupNotifications() {
+        StatusBarNotification[] notifications = mNotificationManager.getActiveNotifications();
+        int count = 0;
+        for (StatusBarNotification notification : notifications) {
+            final int id = notification.getId();
+            if (id != NOTIF_BASE_ID && id != PROGRESS_NOTIF_ID && id != ERROR_NOTIF_ID)
+                count++;
+        }
+        return count;
     }
 
     private void stopService() {
@@ -535,7 +565,7 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
 
     private void saveRecording(int userId) {
         UserHandle currentUser = new UserHandle(userId);
-        mNotificationManager.notifyAsUser(null, mNotificationId,
+        mNotificationManager.notifyAsUser(null, PROGRESS_NOTIF_ID,
                 createProcessingNotification(), currentUser);
 
         mLongExecutor.execute(() -> {
@@ -544,13 +574,16 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
                 Notification notification = createSaveNotification(
                         getRecorder() != null ? getRecorder().save() : null);
                 postGroupNotification(currentUser);
-                mNotificationManager.notifyAsUser(null, mNotificationId,  notification,
+                Notification notification = createSaveNotification(getRecorder().save());
+                mNotificationManager.cancelAsUser(null, PROGRESS_NOTIF_ID, currentUser);
+                mNotificationManager.notifyAsUser(null, mNotificationId, notification,
                         currentUser);
             } catch (IOException | IllegalStateException e) {
                 Log.e(getTag(), "Error saving screen recording: " + e.getMessage());
                 e.printStackTrace();
                 showErrorToast(R.string.screenrecord_save_error);
-                mNotificationManager.cancelAsUser(null, mNotificationId, currentUser);
+                mNotificationManager.cancelAsUser(null, PROGRESS_NOTIF_ID, currentUser);
+                maybeDismissGroup(currentUser);
             }
         });
     }
