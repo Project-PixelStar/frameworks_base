@@ -4495,6 +4495,9 @@ public class ActivityManagerService extends IActivityManager.Stub
             } else {
                 cancelReason = PendingIntentRecord.CANCEL_REASON_OWNER_FORCE_STOPPED;
             }
+        final boolean clearPendingIntentsForStoppedApp = (android.content.pm.Flags.stayStopped()
+                && packageStateStopped);
+        if (packageName == null || uninstalling || clearPendingIntentsForStoppedApp) {
             didSomething |= mPendingIntentController.removePendingIntentsForPackage(
                     packageName, userId, appId, doit, cancelReason);
         }
