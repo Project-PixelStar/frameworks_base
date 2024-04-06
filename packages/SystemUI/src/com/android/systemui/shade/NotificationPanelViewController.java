@@ -4758,6 +4758,12 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
             mConfigurationController.removeCallback(mConfigurationListener);
             mFalsingManager.removeTapListener(mFalsingTapListener);
         }
+        @Override
+        public void onTuningChanged(String key, String newValue) {
+            if (DOUBLE_TAP_SLEEP_GESTURE.equals(key)) {
+                mDoubleTapToSleepEnabled = TunerService.parseIntegerSwitch(newValue, false);
+            }
+        }
     }
 
     private final class ShadeLayoutChangeListener implements View.OnLayoutChangeListener {
