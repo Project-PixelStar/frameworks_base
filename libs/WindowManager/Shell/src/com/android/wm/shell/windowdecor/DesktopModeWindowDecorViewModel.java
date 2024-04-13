@@ -419,6 +419,7 @@ public class DesktopModeWindowDecorViewModel implements WindowDecorViewModel {
                 if (decoration == null) return;
                 decoration.closeMaximizeMenu();
             };
+            mDisplayId = taskInfo.displayId;
         }
 
         @Override
