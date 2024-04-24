@@ -2285,30 +2285,24 @@ public final class CameraManager {
             }
         }
 
-        private String[] extractCameraIdListLocked(int deviceId, int devicePolicy) {
-            List<String> cameraIds = new ArrayList<>();
+        private String[] extractCameraIdListLocked() {
             boolean exposeAuxCamera = Camera.shouldExposeAuxCamera();
             int size = exposeAuxCamera ? mDeviceStatus.size() : 2;
-            int idCount = 0;
+            List<String> cameraIdList = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 int status = mDeviceStatus.valueAt(i);
                 DeviceCameraInfo info = mDeviceStatus.keyAt(i);
                 if (status == ICameraServiceListener.STATUS_NOT_PRESENT
-                        || status == ICameraServiceListener.STATUS_ENUMERATING
-                        || shouldHideCamera(deviceId, devicePolicy, info)) {
+                        || status == ICameraServiceListener.STATUS_ENUMERATING) {
                     continue;
                 }
-                cameraIds.add(info.mCameraId);
+                String cameraId = mDeviceStatus.keyAt(i);
+                cameraIdList.add(cameraId);
             }
-            cameraIds = new String[idCount];
-            idCount = 0;
-            for (int i = 0; i < size; i++) {
-                int status = mDeviceStatus.valueAt(i);
-                if (status == ICameraServiceListener.STATUS_NOT_PRESENT
-                        || status == ICameraServiceListener.STATUS_ENUMERATING) continue;
-                cameraIds[idCount] = mDeviceStatus.keyAt(i);
-                idCount++;
+            if (cameraIdList.isEmpty()) {
+                return null;
             }
+            String[] cameraIds = cameraIdList.toArray(new String[0]);
             return cameraIds;
         }
 
