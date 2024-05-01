@@ -242,8 +242,23 @@ public final class ProfcollectForwardingService extends SystemService {
 
         @Override
         public boolean onStartJob(JobParameters params) {
-            createAndUploadReport(sSelfService);
-            jobFinished(params, false);
+            if (DEBUG) {
+                Log.d(LOG_TAG, "Starting background process job");
+            }
+
+            BackgroundThread.get().getThreadHandler().post(
+                    () -> {
+                        try {
+                            if (sSelfService.mIProfcollect == null) {
+                                return;
+                            }
+                            sSelfService.mIProfcollect.process();
+                            jobFinished(params, false);
+                        } catch (RemoteException e) {
+                            Log.e(LOG_TAG, "Failed to process profiles in background: "
+                                    + e.getMessage());
+                        }
+                    });
             return true;
         }
 
