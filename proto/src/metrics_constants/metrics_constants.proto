@@ -7447,7 +7447,7 @@ message MetricsEvent {
 
     // CUSTOM Metrics
     CUSTOM = 2772;
-    CUSTOM_TILES = 2775;
+    STARFIELD = 2775;
     PIXELSTAR = 2999;
     CUSTOM_CHARGE = 2774;
 
