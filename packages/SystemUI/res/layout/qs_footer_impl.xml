@@ -51,7 +51,7 @@
                 android:layout_marginStart="0dp"
                 android:layout_marginEnd="25dp"
                 android:textAppearance="@style/TextAppearance.QS.TileLabel.DataUsage"
-                android:textColor="?android:attr/textColorPrimary"
+                android:textColor="?android:attr/textColorPrimaryInverse"
                 android:visibility="gone" />
 
             <View
@@ -80,13 +80,12 @@
                     android:layout_width="@dimen/qs_footer_action_button_size"
                     android:layout_height="@dimen/qs_footer_action_button_size"
                     android:layout_gravity="center_vertical|end"
-                    android:background="@drawable/qs_footer_action_circle"
+                    android:background="@drawable/qs_circle_chip"
                     android:clickable="true"
                     android:contentDescription="@string/accessibility_quick_settings_edit"
                     android:focusable="true"
                     android:padding="@dimen/qs_footer_icon_padding"
-                    android:src="@*android:drawable/ic_mode_edit"
-                    android:tint="?attr/onSurfaceVariant" />
+                    android:src="@*android:drawable/new_edit" />
             </FrameLayout>
 
         </LinearLayout>
