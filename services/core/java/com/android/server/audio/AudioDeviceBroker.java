@@ -286,9 +286,18 @@ public class AudioDeviceBroker {
         mBtHelper.onSetBtScoActiveDevice(btDevice);
     }
 
+<<<<<<< HEAD
     /*package*/ void setBluetoothA2dpOn_Async(boolean on, String source) {=
         mBluetoothA2dpEnabled.set(on);
         sendLMsgNoDelay(MSG_L_SET_FORCE_BT_A2DP_USE, SENDMSG_REPLACE, source);
+=======
+    /*package*/ void setBluetoothA2dpOn_Async(boolean on, String source) {
+        boolean wasOn = mBluetoothA2dpEnabled.getAndSet(on);
+        // do not mute music if we do not anticipate a change in A2DP ON state
+        sendLMsgNoDelay(wasOn == on
+                ? MSG_L_SET_FORCE_BT_A2DP_USE_NO_MUTE : MSG_L_SET_FORCE_BT_A2DP_USE,
+                SENDMSG_REPLACE, source);
+>>>>>>> cec9dc02064d (AudioService: do not mute music systematically in setBluetoothA2dpOn)
     }
 
     /**
@@ -1804,7 +1813,7 @@ public class AudioDeviceBroker {
                 case MSG_IIL_SET_FORCE_USE: // intended fall-through
                     onSetForceUse(msg.arg1, msg.arg2, false, (String) msg.obj);
                     break;
-                case MSG_L_SET_FORCE_BT_A2DP_USE_NO_MUTE:
+                case MSG_L_SET_FORCE_BT_A2DP_USE:
                     int forcedUsage = mBluetoothA2dpEnabled.get()
                             ? AudioSystem.FORCE_NONE : AudioSystem.FORCE_NO_BT_A2DP;
                     onSetForceUse(AudioSystem.FOR_MEDIA, forcedUsage, true, (String) msg.obj);
@@ -2107,6 +2116,7 @@ public class AudioDeviceBroker {
     private static final int MSG_L_SYNCHRONIZE_ADI_DEVICES_IN_INVENTORY = 58;
     private static final int MSG_L_UPDATED_ADI_DEVICE_STATE = 59;
     private static final int MSG_L_BROADCAST_STICKY_INTENT_TO_CURRENT_PROFILE_GROUP = 60;
+    private static final int MSG_L_SET_FORCE_BT_A2DP_USE_NO_MUTE = 61;
 
     private static boolean isMessageHandledUnderWakelock(int msgId) {
         switch(msgId) {
