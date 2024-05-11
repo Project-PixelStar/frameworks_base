@@ -253,7 +253,6 @@ public final class ProfcollectForwardingService extends SystemService {
                                 return;
                             }
                             sSelfService.mIProfcollect.process();
-                            jobFinished(params, false);
                         } catch (RemoteException e) {
                             Log.e(LOG_TAG, "Failed to process profiles in background: "
                                     + e.getMessage());
