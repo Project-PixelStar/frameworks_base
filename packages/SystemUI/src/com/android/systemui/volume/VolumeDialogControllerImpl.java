@@ -78,6 +78,11 @@ import com.android.systemui.statusbar.VibratorHelper;
 import com.android.systemui.util.RingerModeLiveData;
 import com.android.systemui.util.RingerModeTracker;
 import com.android.systemui.util.concurrency.ThreadFactory;
+import android.os.AsyncTask;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.provider.Settings;
+import java.time.Duration;
 
 import dalvik.annotation.optimization.NeverCompile;
 
@@ -522,6 +527,31 @@ public class VolumeDialogControllerImpl implements VolumeDialogController, Dumpa
                 && mShowVolumeDialog;
     }
 
+    private void triggerVibration() {
+        int vibrateIntensity = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.VOLUME_SLIDER_HAPTICS_INTENSITY, 1);
+        if (mVibrator == null || vibrateIntensity == 0) {
+            return;
+        }
+            VibrationEffect effect;
+            switch (vibrateIntensity) {
+                case 1:
+                    effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_TEXTURE_TICK);
+                    break;
+                case 2:
+                    effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK);
+                    break;
+                case 3:
+                    effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK);
+                    break;
+                default:
+                    effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_TEXTURE_TICK);
+                    break;
+            }
+
+        AsyncTask.execute(() -> mVibrator.vibrate(effect));
+    }
+
     boolean onVolumeChangedW(int stream, int flags) {
         final boolean showUI = shouldShowUI(flags);
         final boolean fromKey = (flags & AudioManager.FLAG_FROM_KEY) != 0;
@@ -539,6 +569,13 @@ public class VolumeDialogControllerImpl implements VolumeDialogController, Dumpa
         }
         if (showUI) {
             onShowRequestedW(Events.SHOW_REASON_VOLUME_CHANGED);
+            // Only trigger vibration if the UI is shown and volume level has changed
+            if (changed) {
+                new Handler(Looper.getMainLooper()).postDelayed(this::triggerVibration, 16);
+            }
+        } else {
+            // If the UI is not shown, trigger vibration immediately
+            triggerVibration();
         }
         if (showVibrateHint) {
             mCallbacks.onShowVibrateHint();
