@@ -3015,6 +3015,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                 if (D.BUG) Log.d(TAG, "set app " + mRow.packageName + " volume to " + vol);
                 mController.getAudioManager().setAppVolume(mRow.packageName, vol);
                 updateAppVolumeRows();
+                triggerVibration();
                 return;
             }
             if (mRow.ss == null) return;
