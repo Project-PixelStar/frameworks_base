@@ -245,19 +245,8 @@ public final class ProfcollectForwardingService extends SystemService {
             if (DEBUG) {
                 Log.d(LOG_TAG, "Starting background process job");
             }
-
-            BackgroundThread.get().getThreadHandler().post(
-                    () -> {
-                        try {
-                            if (sSelfService.mIProfcollect == null) {
-                                return;
-                            }
-                            sSelfService.mIProfcollect.process();
-                        } catch (RemoteException e) {
-                            Log.e(LOG_TAG, "Failed to process profiles in background: "
-                                    + e.getMessage());
-                        }
-                    });
+            createAndUploadReport(sSelfService);
+            jobFinished(params, false);
             return true;
         }
 
@@ -367,23 +356,27 @@ public final class ProfcollectForwardingService extends SystemService {
 
     private static void createAndUploadReport(ProfcollectForwardingService pfs) {
         BackgroundThread.get().getThreadHandler().post(() -> {
-            String reportName;
-            try {
-                reportName = pfs.mIProfcollect.report(pfs.mUsageSetting) + ".zip";
-            } catch (RemoteException e) {
-                Log.e(LOG_TAG, "Failed to create report: " + e.getMessage());
-                return;
-            }
-            if (!pfs.mUploadEnabled) {
-                Log.i(LOG_TAG, "Upload is not enabled.");
-                return;
-            }
+        String reportName;
+        try {
+            reportName = pfs.mIProfcollect.report(pfs.mUsageSetting) + ".zip";
+        } catch (RemoteException e) {
+            Log.e(LOG_TAG, "Failed to create report: " + e.getMessage());
+            return;
+        }
+        if (!pfs.mUploadEnabled) {
+            Log.i(LOG_TAG, "Upload is not enabled.");
+            return;
+        }
+        BackgroundThread.get().getThreadHandler().post(() -> {
             Intent intent = new Intent()
                     .setPackage("com.android.shell")
                     .setAction("com.android.shell.action.PROFCOLLECT_UPLOAD")
                     .putExtra("filename", reportName);
             pfs.getContext().sendBroadcast(intent);
         });
+        if (DEBUG) {
+            Log.d(LOG_TAG, "Sent report for upload.");
+        }
     }
 
     private void registerCameraOpenObserver() {
