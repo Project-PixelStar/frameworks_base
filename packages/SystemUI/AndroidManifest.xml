@@ -534,6 +534,8 @@
                     android:resource="@string/summary_empty"/>
             <meta-data android:name="com.android.settings.icon"
                     android:resource="@drawable/tuner"/>
+            <meta-data android:name="com.android.settings.profile"
+                    android:value="primary_profile_only" />
         </activity>
 
         <activity-alias
