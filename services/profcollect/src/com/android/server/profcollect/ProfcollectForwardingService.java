@@ -242,9 +242,6 @@ public final class ProfcollectForwardingService extends SystemService {
 
         @Override
         public boolean onStartJob(JobParameters params) {
-            if (DEBUG) {
-                Log.d(LOG_TAG, "Starting background process job");
-            }
             createAndUploadReport(sSelfService);
             jobFinished(params, false);
             return true;
@@ -326,8 +323,8 @@ public final class ProfcollectForwardingService extends SystemService {
                 "dex2oat_trace_freq", 25);
         int randomNum = ThreadLocalRandom.current().nextInt(100);
         if (randomNum < traceFrequency) {
-            // Dex2oat could take a while before it starts. Add a short delay before start tracing.
-            BackgroundThread.get().getThreadHandler().postDelayed(() -> {
+            // Dex2oat could take a while before it starts. Add a short delay before start tracing
+            BackgroundThread.get().getThreadHandler().post(() -> {
                 try {
                     mIProfcollect.trace_once("dex2oat");
                 } catch (RemoteException e) {
@@ -373,9 +370,6 @@ public final class ProfcollectForwardingService extends SystemService {
                     .putExtra("filename", reportName);
             pfs.getContext().sendBroadcast(intent);
         });
-        if (DEBUG) {
-            Log.d(LOG_TAG, "Sent report for upload.");
-        }
     }
 
     private void registerCameraOpenObserver() {
