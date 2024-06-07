@@ -596,12 +596,11 @@ constructor(
         }
 
         if (mediaControlsLockscreenShadeBugFix()) {
-            coroutineScope.launch {
-                shadeInteractor.shadeExpansion.collect { expansion ->
-                    if (expansion >= 1f || expansion <= 0f) {
-                        // Shade has fully expanded or collapsed: force transition amount update
-                        setTransitionToFullShadeAmount(expansion)
-                    }
+        coroutineScope.launch {
+            shadeInteractor.shadeExpansion.collect { expansion ->
+                if (expansion >= 1f || expansion <= 0f) {
+                    // Shade has fully expanded or collapsed: force transition amount update
+                    setTransitionToFullShadeAmount(expansion)
                 }
             }
         }
