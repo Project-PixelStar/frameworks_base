@@ -1993,6 +1993,9 @@ public final class InputMethodManagerService extends IInputMethodManager.Stub
             throw new InvalidParameterException("token must not be null.");
         }
         if (token != getCurTokenLocked()) {
+            if (!android.os.DeviceIntegrationUtils.DISABLE_DEVICE_INTEGRATION) {
+                return true;
+            }
             Slog.e(TAG, "Ignoring " + Debug.getCaller() + " due to an invalid token."
                     + " uid:" + Binder.getCallingUid() + " token:" + token);
             return false;
