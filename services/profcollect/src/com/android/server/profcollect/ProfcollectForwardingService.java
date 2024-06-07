@@ -323,8 +323,8 @@ public final class ProfcollectForwardingService extends SystemService {
                 "dex2oat_trace_freq", 25);
         int randomNum = ThreadLocalRandom.current().nextInt(100);
         if (randomNum < traceFrequency) {
-            // Dex2oat could take a while before it starts. Add a short delay before start tracing
-            BackgroundThread.get().getThreadHandler().post(() -> {
+            // Dex2oat could take a while before it starts. Add a short delay before start tracing.
+            BackgroundThread.get().getThreadHandler().postDelayed(() -> {
                 try {
                     mIProfcollect.trace_once("dex2oat");
                 } catch (RemoteException e) {
