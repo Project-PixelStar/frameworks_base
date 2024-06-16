@@ -601,7 +601,9 @@ public class SenseProvider implements ServiceProvider {
                     ENROLL_TIMEOUT_SEC, previewSurface, mSensorId,
                     createLogger(BiometricsProtoEnums.ACTION_ENROLL,
                             BiometricsProtoEnums.CLIENT_UNKNOWN),
-                    mBiometricContext);
+                    mBiometricContext,
+                    mContext.getResources().getInteger(
+                                com.android.internal.R.integer.config_faceMaxTemplatesPerUser));
 
             mScheduler.scheduleClientMonitor(client, new ClientMonitorCallback() {
                 @Override
