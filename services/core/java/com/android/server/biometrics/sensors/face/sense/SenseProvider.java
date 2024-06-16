@@ -399,7 +399,7 @@ public class SenseProvider implements ServiceProvider {
     }
 
     public SenseProvider(Context context, BiometricStateCallback biometricStateCallback, FaceSensorPropertiesInternal sensorProps, LockoutResetDispatcher lockoutResetDispatcher) {
-        this(context, biometricStateCallback, sensorProps, lockoutResetDispatcher, new BiometricScheduler(context, TAG, 0, null, BiometricContext.getInstance(context)));
+        this(context, biometricStateCallback, sensorProps, lockoutResetDispatcher, new BiometricScheduler<>(context, 0, null));
     }
 
     private synchronized ISenseService getDaemon() {
@@ -601,7 +601,7 @@ public class SenseProvider implements ServiceProvider {
                     ENROLL_TIMEOUT_SEC, previewSurface, mSensorId,
                     createLogger(BiometricsProtoEnums.ACTION_ENROLL,
                             BiometricsProtoEnums.CLIENT_UNKNOWN),
-                    mBiometricContext, options);
+                    mBiometricContext);
 
             mScheduler.scheduleClientMonitor(client, new ClientMonitorCallback() {
                 @Override
