@@ -39,6 +39,7 @@ import android.util.Log;
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.config.sysui.SystemUiDeviceConfigFlags;
 import com.android.systemui.flags.FeatureFlags;
+import com.android.systemui.res.R;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
