@@ -97,6 +97,21 @@ class ToggleButtonComponent(
                 ) {
                     Icon(modifier = Modifier.size(24.dp), icon = viewModel.icon)
                 }
+            OutlinedIconToggleButton(
+                modifier = Modifier.height(64.dp).fillMaxWidth(),
+                checked = viewModel.isChecked,
+                onCheckedChange = onCheckedChange,
+                shape = RoundedCornerShape(28.dp),
+                colors =
+                    IconButtonDefaults.outlinedIconToggleButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        checkedContainerColor = MaterialTheme.colorScheme.secondary,
+                        checkedContentColor = MaterialTheme.colorScheme.onSecondary,
+                    ),
+                border = BorderStroke(8.dp, MaterialTheme.colorScheme.surface),
+            ) {
+                Icon(modifier = Modifier.size(24.dp), icon = viewModel.icon)
             }
 
             Text(

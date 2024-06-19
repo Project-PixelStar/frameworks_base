@@ -100,6 +100,16 @@ class ButtonComponent(
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Icon(modifier = Modifier.size(24.dp), icon = viewModel.icon)
                     }
+            Expandable(
+                modifier = Modifier.height(64.dp).fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(28.dp),
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                borderStroke = BorderStroke(8.dp, MaterialTheme.colorScheme.primary),
+                onClick = onClick,
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Icon(modifier = Modifier.size(24.dp), icon = viewModel.icon)
                 }
             }
             Text(

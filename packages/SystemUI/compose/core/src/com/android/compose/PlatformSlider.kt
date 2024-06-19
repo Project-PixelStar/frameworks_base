@@ -469,6 +469,33 @@ object PlatformSliderDefaults {
         )
 }
 
+/** [PlatformSliderColors] for the light theme */
+@Composable
+private fun lightThemePlatformSliderColors() =
+    PlatformSliderColors(
+        trackColor = MaterialTheme.colorScheme.primaryContainer,
+        indicatorColor = LocalAndroidColorScheme.current.primaryFixedDim,
+        iconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        disabledTrackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        disabledIndicatorColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        disabledIconColor = MaterialTheme.colorScheme.outline,
+        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+
+/** [PlatformSliderColors] for the dark theme */
+@Composable
+private fun darkThemePlatformSliderColors() =
+    PlatformSliderColors(
+        trackColor = MaterialTheme.colorScheme.onPrimary,
+        indicatorColor = LocalAndroidColorScheme.current.onPrimaryFixedVariant,
+        iconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        disabledTrackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        disabledIndicatorColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        disabledIconColor = MaterialTheme.colorScheme.outline,
+        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 private fun PlatformSliderColors.getTrackColor(isEnabled: Boolean): Color =
     if (isEnabled) trackColor else disabledTrackColor
 
