@@ -324,6 +324,9 @@ class SplitScreenTransitions {
     boolean isPendingPassThrough(IBinder transition) {
         return mPendingRemotePassthrough != null &&
                 mPendingRemotePassthrough.mTransition == transition;
+
+    public SurfaceControl.Transaction getFinishTransaction() {
+       return mAnimatingTransition != null ? mFinishTransaction : null;
     }
 
     @Nullable
