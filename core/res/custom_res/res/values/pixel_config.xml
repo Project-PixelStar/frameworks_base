@@ -18,6 +18,7 @@
         <item>com.shannon.imsservice</item>
         <item>org.pixelexperience.faceunlock</item>
         <item>co.aospa.sense</item>
+        <item>com.google.android.setupwizard</item>
     </string-array>
 
     <!-- Whether to cancel fingerprint operation if not idle -->
