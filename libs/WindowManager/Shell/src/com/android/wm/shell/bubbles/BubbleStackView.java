@@ -461,7 +461,7 @@ public class BubbleStackView extends FrameLayout
 
                 @Override
                 public void onStuckToTarget(@NonNull MagnetizedObject.MagneticTarget target,
-                        @NonNull MagnetizedObject<?> draggedObject) {
+                        @NonNull MagnetizedObject draggedObject) {
                     Object underlyingObject = draggedObject.getUnderlyingObject();
                     if (underlyingObject instanceof View) {
                         View view = (View) underlyingObject;
