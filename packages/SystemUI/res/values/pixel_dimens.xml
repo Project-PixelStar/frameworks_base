@@ -2,4 +2,7 @@
 <resources>
     <!-- Screen Record -->
     <dimen name="screenrecord_dot_size">48dp</dimen>
+
+    <!-- Volume app icon -->  
+    <dimen name="volume_app_icon_max_size">108dp</dimen>
 </resources>
