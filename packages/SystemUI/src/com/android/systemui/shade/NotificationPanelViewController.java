@@ -74,6 +74,7 @@ import android.os.PowerManager;
 import android.os.PowerManagerInternal;
 import android.os.Trace;
 import android.os.UserManager;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.IndentingPrintWriter;
 import android.util.Log;
@@ -305,6 +306,9 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
 
     private static final String STATUS_BAR_QUICK_QS_PULLDOWN =
             "customsystem:" + Settings.System.STATUS_BAR_QUICK_QS_PULLDOWN;
+
+    private static final String QS_HAPTICS_INTENSITY =
+            "system:" + "qs_haptics_intensity";
 
     private static final Rect M_DUMMY_DIRTY_RECT = new Rect(0, 0, 1, 1);
     private static final Rect EMPTY_RECT = new Rect();
@@ -652,6 +656,9 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
     private int mGoneToDreamingTransitionTranslationY;
     private boolean mForceFlingAnimationForTest = false;
     private final SplitShadeStateController mSplitShadeStateController;
+
+    private int mQsHapticsIntensity;
+
     private final Runnable mFlingCollapseRunnable = () -> fling(0, false /* expand */,
             mNextCollapseSpeedUpFactor, false /* expandBecauseOfFalsing */);
     private final Runnable mAnimateKeyguardBottomAreaInvisibleEndRunnable =
@@ -3868,7 +3875,7 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
     private void maybeVibrateOnOpening(boolean openingWithTouch) {
         if (mVibrateOnOpening && mBarState != KEYGUARD && mBarState != SHADE_LOCKED) {
             if (!openingWithTouch || !mHasVibratedOnOpen) {
-                VibrationUtils.triggerVibration(mView.getContext(), 2);
+                VibrationUtils.triggerVibration(mView.getContext(), mQsHapticsIntensity);
                 mHasVibratedOnOpen = true;
                 mShadeLog.v("Vibrating on opening, mHasVibratedOnOpen=true");
             }
@@ -4801,6 +4808,7 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
             mConfigurationController.addCallback(mConfigurationListener);
             mTunerService.addTunable(this, DOUBLE_TAP_SLEEP_GESTURE);
             mTunerService.addTunable(this, STATUS_BAR_QUICK_QS_PULLDOWN);
+            mTunerService.addTunable(this, QS_HAPTICS_INTENSITY);
             // Theme might have changed between inflating this view and attaching it to the
             // window, so
             // force a call to onThemeChanged
@@ -4822,10 +4830,18 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
         }
         @Override
         public void onTuningChanged(String key, String newValue) {
-            if (DOUBLE_TAP_SLEEP_GESTURE.equals(key)) {
-                mDoubleTapToSleepEnabled = TunerService.parseIntegerSwitch(newValue, false);
-            } else if (STATUS_BAR_QUICK_QS_PULLDOWN.equals(key)) {
-                mOneFingerQuickSettingsIntercept = TunerService.parseInteger(newValue, 0);
+            switch (key) {
+                case STATUS_BAR_QUICK_QS_PULLDOWN:
+                    mOneFingerQuickSettingsIntercept = TunerService.parseInteger(newValue, 0);
+                    break;
+                case DOUBLE_TAP_SLEEP_GESTURE:
+                   mDoubleTapToSleepEnabled = TunerService.parseIntegerSwitch(newValue, true);
+                   break;
+                case QS_HAPTICS_INTENSITY:
+                    mQsHapticsIntensity = TunerService.parseInteger(newValue, 1);
+                    break;
+                default:
+                   break;
             }
         }
     }
