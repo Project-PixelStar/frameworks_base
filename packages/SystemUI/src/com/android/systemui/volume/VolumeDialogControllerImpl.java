@@ -81,6 +81,10 @@ import com.android.systemui.util.concurrency.ThreadFactory;
 
 import dalvik.annotation.optimization.NeverCompile;
 
+import android.provider.DeviceConfig;
+import android.os.Vibrator;
+import com.android.internal.util.android.VibrationUtils;
+
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -539,6 +543,23 @@ public class VolumeDialogControllerImpl implements VolumeDialogController, Dumpa
         }
         if (showUI) {
             onShowRequestedW(Events.SHOW_REASON_VOLUME_CHANGED);
+            // Only trigger vibration if the UI is shown and volume level has changed
+            if (changed) {
+                if (Settings.System.getInt(mContext.getContentResolver(), Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0 &&
+                    Settings.System.getInt(mContext.getContentResolver(), Settings.System.ROCKER_HAPTICS, 1) != 0) {
+                    int vibrateIntensity = Settings.System.getInt(mContext.getContentResolver(),
+                                Settings.System.VOLUME_SLIDER_HAPTICS_INTENSITY, 1);
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> VibrationUtils.triggerVibration(mContext, vibrateIntensity), 16);
+                }
+            }
+        } else {
+            // If the UI is not shown, trigger vibration immediately
+            if (Settings.System.getInt(mContext.getContentResolver(), Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0 &&
+                Settings.System.getInt(mContext.getContentResolver(), Settings.System.ROCKER_HAPTICS, 1) != 0) {
+                int vibrateIntensity = Settings.System.getInt(mContext.getContentResolver(),
+                            Settings.System.VOLUME_SLIDER_HAPTICS_INTENSITY, 1);
+                VibrationUtils.triggerVibration(mContext, vibrateIntensity);
+            }
         }
         if (showVibrateHint) {
             mCallbacks.onShowVibrateHint();

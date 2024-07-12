@@ -6890,6 +6890,12 @@ public final class Settings {
         public static final String VOLUME_SLIDER_HAPTICS_INTENSITY = "volume_slider_haptics_intensity";
 
         /**
+         * Whether do haptic feedback on changing volume with rocker
+         * @hide
+         */
+        public static final String ROCKER_HAPTICS = "rocker_haptics";
+
+        /**
          * These are all public system settings
          *
          * @hide
