@@ -128,7 +128,6 @@ import com.android.internal.annotations.Immutable;
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.os.SomeArgs;
 import com.android.internal.util.UserIcons;
-import com.android.internal.util.custom.CustomFeaturesUtils;
 
 import dalvik.system.VMRuntime;
 
@@ -824,12 +823,6 @@ public class ApplicationPackageManager extends PackageManager {
 
     @Override
     public boolean hasSystemFeature(String name, int version) {
-        final int report = CustomFeaturesUtils.hasSystemFeatureCustom(name);
-        switch (report) {
-            case 0: return false;
-            case 1: return true;
-            default:
-        }
         return mHasSystemFeatureCache.query(new HasSystemFeatureQuery(name, version));
     }
 
