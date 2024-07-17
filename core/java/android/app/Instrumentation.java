@@ -72,9 +72,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeoutException;
 
-import com.android.internal.util.custom.PixelPropsUtils;
-import com.android.internal.util.custom.GamesPropsUtils;
-
 /**
  * Base class for implementing application instrumentation code.  When running
  * with instrumentation turned on, this class will be instantiated for you
@@ -1354,11 +1351,9 @@ public class Instrumentation {
         Application app = getFactory(context.getPackageName())
                 .instantiateApplication(cl, className);
         app.attach(context);
-        PixelPropsUtils.setProps(context);
-        GamesPropsUtils.setProps(context);
         return app;
     }
-
+    
     /**
      * Perform instantiation of the process's {@link Application} object.  The
      * default implementation provides the normal system behavior.
@@ -1373,8 +1368,6 @@ public class Instrumentation {
             ClassNotFoundException {
         Application app = (Application)clazz.newInstance();
         app.attach(context);
-        PixelPropsUtils.setProps(context);
-        GamesPropsUtils.setProps(context);
         return app;
     }
 
