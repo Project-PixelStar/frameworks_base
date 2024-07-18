@@ -27,7 +27,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.android.systemui.R;
+import com.android.systemui.res.R;
 
 import com.android.internal.util.android.VibrationUtils;
 

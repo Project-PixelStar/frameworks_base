@@ -31,7 +31,7 @@ import android.widget.LinearLayout;
 
 import com.android.systemui.MultiListLayout;
 import com.android.systemui.MultiListLayout.MultiListAdapter;
-import com.android.systemui.R;
+import com.android.systemui.res.R;
 
 import com.android.systemui.statusbar.BlurUtils;
 import com.android.systemui.dump.DumpManager;
