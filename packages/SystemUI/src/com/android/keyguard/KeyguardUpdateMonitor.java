@@ -138,6 +138,7 @@ import com.android.systemui.keyguard.shared.constants.TrustAgentUiEvent;
 import com.android.systemui.log.SessionTracker;
 import com.android.systemui.plugins.clocks.WeatherData;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
+import com.android.systemui.PocketStateReceiver;
 import com.android.systemui.res.R;
 import com.android.systemui.settings.UserTracker;
 import com.android.systemui.shared.system.TaskStackChangeListener;
@@ -181,7 +182,7 @@ import javax.inject.Provider;
  * to be updated.
  */
 @SysUISingleton
-public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpable, CoreStartable {
+public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpable, CoreStartable, PocketStateReceiver.PocketStateListener {
 
     private static final String TAG = "KeyguardUpdateMonitor";
     private static final int BIOMETRIC_LOCKOUT_RESET_DELAY_MS = 600;
@@ -331,6 +332,9 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
 
     // Device provisioning state
     private boolean mDeviceProvisioned;
+    
+    private PocketStateReceiver mPocketStateReceiver;
+    private boolean mIsDeviceInPocket = false;
 
     // Battery status
     @VisibleForTesting
@@ -2208,6 +2212,9 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
 
         mFingerprintInteractiveToAuthProvider = interactiveToAuthProvider.orElse(null);
         mIsSystemUser = mUserManager.isSystemUser();
+        
+        mPocketStateReceiver = new PocketStateReceiver(this);
+        mPocketStateReceiver.register(context);
 
         mHandler = new Handler(mainLooper) {
             @Override
@@ -2816,6 +2823,11 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
                 && !mUserHasTrust.get(mSelectedUserInteractor.getSelectedUserId(), false);
     }
 
+    @Override
+    public void onPocketStateChanged(boolean isInPocket) {
+        mIsDeviceInPocket = isInPocket;
+    }
+
     @VisibleForTesting
     protected boolean shouldListenForFingerprint(boolean isUdfps) {
         final int user = mSelectedUserInteractor.getSelectedUserId();
@@ -2864,7 +2876,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
 
         boolean shouldListen = shouldListenKeyguardState && shouldListenUserState
                 && shouldListenBouncerState && shouldListenUdfpsState && !mBiometricPromptShowing
-                && shouldListenFpsState;
+                && shouldListenFpsState && !mIsDeviceInPocket;
         logListenerModelData(
                 new KeyguardFingerprintListenModel(
                     System.currentTimeMillis(),
@@ -2903,7 +2915,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
      */
     @Deprecated
     public boolean shouldListenForFace() {
-        return getFaceAuthInteractor() != null && getFaceAuthInteractor().canFaceAuthRun();
+        return getFaceAuthInteractor() != null && getFaceAuthInteractor().canFaceAuthRun() && !mIsDeviceInPocket;
     }
 
 
