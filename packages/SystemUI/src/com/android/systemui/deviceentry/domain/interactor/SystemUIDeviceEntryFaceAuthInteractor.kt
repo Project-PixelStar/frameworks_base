@@ -88,6 +88,8 @@ constructor(
 ) : CoreStartable, DeviceEntryFaceAuthInteractor {
 
     private val listeners: MutableList<FaceAuthenticationListener> = mutableListOf()
+    
+    private var isDeviceInPocket = false
 
     private fun shouldDisableLockOut(): Boolean {
         return Settings.System.getInt(
@@ -265,7 +267,7 @@ constructor(
 
     override fun isRunning(): Boolean = repository.isAuthRunning.value
 
-    override fun canFaceAuthRun(): Boolean = repository.canRunFaceAuth.value
+    override fun canFaceAuthRun(): Boolean = !isDeviceInPocket && repository.canRunFaceAuth.value
 
     override fun isFaceAuthStrong(): Boolean =
         facePropertyRepository.sensorInfo.value?.strength == SensorStrength.STRONG
@@ -281,6 +283,10 @@ constructor(
 
     /** Provide the status of face detection */
     override val detectionStatus = repository.detectionStatus
+    
+    override fun setPocketState(isInPocket: Boolean) {
+        this.isDeviceInPocket = isInPocket
+    }
 
     private fun runFaceAuth(uiEvent: FaceAuthUiEvent, fallbackToDetect: Boolean) {
         if (repository.isLockedOut.value && !shouldDisableLockOut()) {
@@ -290,6 +296,7 @@ constructor(
                     context.resources.getString(R.string.keyguard_face_unlock_unavailable)
                 )
         } else {
+            if (isDeviceInPocket) return
             faceAuthenticationStatusOverride.value = null
             faceAuthenticationLogger.authRequested(uiEvent)
             repository.requestAuthenticate(uiEvent, fallbackToDetection = fallbackToDetect)
