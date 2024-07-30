@@ -1297,9 +1297,8 @@ public class NotificationStackScrollLayoutController implements Dumpable {
     }
 
     /** Set the max alpha for keyguard */
-    public void setMaxAlphaForKeyguard(float alpha, String source) {
-        mMaxAlphaForKeyguard = alpha;
-        mMaxAlphaForKeyguardSource = source;
+    public void setMaxAlphaForExpansion(float alpha) {
+        mMaxAlphaForExpansion = alpha < 0.95f ? 0f : alpha;
         updateAlpha();
         if (DEBUG) {
             Log.d(TAG, "setMaxAlphaForKeyguard=" + alpha + " --- from: " + source);
@@ -1307,7 +1306,7 @@ public class NotificationStackScrollLayoutController implements Dumpable {
     }
 
     private void setMaxAlphaForUnhide(float alpha) {
-        mMaxAlphaForUnhide = alpha;
+        mMaxAlphaForUnhide = alpha < 0.95f ? 0f : alpha;
         updateAlpha();
     }
 
@@ -1316,7 +1315,7 @@ public class NotificationStackScrollLayoutController implements Dumpable {
      * transitioning to/from the glanceable hub.
      */
     public void setMaxAlphaForGlanceableHub(float alpha) {
-        mMaxAlphaForGlanceableHub = alpha;
+        mMaxAlphaForGlanceableHub = alpha < 0.95f ? 0f : alpha;
         updateAlpha();
     }
 
