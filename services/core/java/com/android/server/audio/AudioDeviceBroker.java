@@ -1454,6 +1454,11 @@ public class AudioDeviceBroker {
         sendIMsgNoDelay(MSG_I_BROADCAST_BT_CONNECTION_STATE, SENDMSG_QUEUE, state);
     }
 
+    /*package*/ void postBroadcastStickyIntentToCurrentProfileGroup(Intent intent) {
+        sendLMsgNoDelay(MSG_L_BROADCAST_STICKY_INTENT_TO_CURRENT_PROFILE_GROUP,
+                SENDMSG_QUEUE, intent);
+    }
+
     /*package*/ void postBroadcastBecomingNoisy() {
         sendMsgNoDelay(MSG_BROADCAST_AUDIO_BECOMING_NOISY, SENDMSG_REPLACE);
     }
@@ -1644,7 +1649,7 @@ public class AudioDeviceBroker {
         return mBtHelper.getLeAudioGroupAddresses(groupId);
     }
 
-    /*package*/ void broadcastStickyIntentToCurrentProfileGroup(Intent intent) {
+    /*package*/ void onBroadcastStickyIntentToCurrentProfileGroup(Intent intent) {
         mSystemServer.broadcastStickyIntentToCurrentProfileGroup(intent);
     }
 
@@ -1877,6 +1882,9 @@ public class AudioDeviceBroker {
                 case MSG_BROADCAST_AUDIO_BECOMING_NOISY:
                     onSendBecomingNoisyIntent();
                     break;
+                case MSG_L_BROADCAST_STICKY_INTENT_TO_CURRENT_PROFILE_GROUP:
+                    onBroadcastStickyIntentToCurrentProfileGroup((Intent) msg.obj);
+                    break;
                 case MSG_II_SET_HEARING_AID_VOLUME:
                     synchronized (mDeviceStateLock) {
                         mBtHelper.setHearingAidVolume(msg.arg1, msg.arg2,
@@ -2097,8 +2105,8 @@ public class AudioDeviceBroker {
     private static final int MSG_CHECK_COMMUNICATION_ROUTE_CLIENT_STATE = 56;
     private static final int MSG_I_UPDATE_LE_AUDIO_GROUP_ADDRESSES = 57;
     private static final int MSG_L_SYNCHRONIZE_ADI_DEVICES_IN_INVENTORY = 58;
-    private static final int MSG_IL_UPDATED_ADI_DEVICE_STATE = 59;
-    private static final int MSG_L_SET_FORCE_BT_A2DP_USE_NO_MUTE = 60;
+    private static final int MSG_L_UPDATED_ADI_DEVICE_STATE = 59;
+    private static final int MSG_L_BROADCAST_STICKY_INTENT_TO_CURRENT_PROFILE_GROUP = 60;
 
     private static boolean isMessageHandledUnderWakelock(int msgId) {
         switch(msgId) {
