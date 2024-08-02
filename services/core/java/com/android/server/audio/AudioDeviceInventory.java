@@ -2733,12 +2733,7 @@ public class AudioDeviceInventory {
 
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
 
-        final long ident = Binder.clearCallingIdentity();
-        try {
-            mDeviceBroker.broadcastStickyIntentToCurrentProfileGroup(intent);
-        } finally {
-            Binder.restoreCallingIdentity(ident);
-        }
+        mDeviceBroker.postBroadcastStickyIntentToCurrentProfileGroup(intent);
     }
 
     private void updateAudioRoutes(int device, int state) {
