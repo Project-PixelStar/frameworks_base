@@ -380,6 +380,9 @@ public abstract class WindowDecoration<T extends View & TaskFocusStateConsumer>
             mWindowDecorationInsets.addOrUpdate(wct);
         }
     }
+        // Task surface itself
+        float shadowRadius = 0;
+        final Point taskPosition = mTaskInfo.positionInParent;
 
     private void updateTaskSurface(RelayoutParams params, SurfaceControl.Transaction startT,
             SurfaceControl.Transaction finishT, RelayoutResult<T> outResult) {
