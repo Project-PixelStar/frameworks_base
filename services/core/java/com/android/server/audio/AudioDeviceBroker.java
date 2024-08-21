@@ -286,12 +286,9 @@ public class AudioDeviceBroker {
         mBtHelper.onSetBtScoActiveDevice(btDevice);
     }
 
-    /*package*/ void setBluetoothA2dpOn_Async(boolean on, String source) {
-        boolean wasOn = mBluetoothA2dpEnabled.getAndSet(on);
-        // do not mute music if we do not anticipate a change in A2DP ON state
-        sendLMsgNoDelay(wasOn == on
-                ? MSG_L_SET_FORCE_BT_A2DP_USE_NO_MUTE : MSG_L_SET_FORCE_BT_A2DP_USE,
-                SENDMSG_REPLACE, source);
+    /*package*/ void setBluetoothA2dpOn_Async(boolean on, String source) {=
+        mBluetoothA2dpEnabled.set(on);
+        sendLMsgNoDelay(MSG_L_SET_FORCE_BT_A2DP_USE, SENDMSG_REPLACE, source);
     }
 
     /**
@@ -1827,7 +1824,6 @@ public class AudioDeviceBroker {
                 case MSG_IIL_SET_FORCE_USE: // intended fall-through
                     onSetForceUse(msg.arg1, msg.arg2, false, (String) msg.obj);
                     break;
-                case MSG_L_SET_FORCE_BT_A2DP_USE:
                 case MSG_L_SET_FORCE_BT_A2DP_USE_NO_MUTE:
                     int forcedUsage = mBluetoothA2dpEnabled.get()
                             ? AudioSystem.FORCE_NONE : AudioSystem.FORCE_NO_BT_A2DP;
@@ -1848,22 +1844,23 @@ public class AudioDeviceBroker {
                                         + "received with null profile proxy: "
                                         + btInfo)).printLog(TAG));
                     } else {
-                        final Pair<Integer, Boolean> codecAndChanged =
+                        @AudioSystem.AudioFormatNativeEnumForBtCodec final int codec =
                                 mBtHelper.getCodecWithFallback(btInfo.mDevice,
                                         btInfo.mProfile, btInfo.mIsLeOutput,
                                         "MSG_L_SET_BT_ACTIVE_DEVICE");
                         synchronized (mSetModeLock) {
                             synchronized (mDeviceStateLock) {
-                                mDeviceInventory.onSetBtActiveDevice(btInfo, codecAndChanged.first,
-                                        (btInfo.mProfile != BluetoothProfile.LE_AUDIO
+                              mDeviceInventory.onSetBtActiveDevice(btInfo, codec,
+                                        (btInfo.mProfile
+                                                != BluetoothProfile.LE_AUDIO
                                                 || btInfo.mIsLeOutput)
-                                            ? mAudioService.getBluetoothContextualVolumeStream()
-                                            : AudioSystem.STREAM_DEFAULT);
+                                                ? mAudioService.getBluetoothContextualVolumeStream()
+                                                : AudioSystem.STREAM_DEFAULT);
                                 if (btInfo.mProfile == BluetoothProfile.LE_AUDIO
-                                        || btInfo.mProfile == BluetoothProfile.HEARING_AID
-                                        || (mScoManagedByAudio
-                                            && btInfo.mProfile == BluetoothProfile.HEADSET)) {
-                                    onUpdateCommunicationRouteClient(isBluetoothScoRequested(),
+                                        || btInfo.mProfile
+                                        == BluetoothProfile.HEARING_AID) {
+                                    onUpdateCommunicationRouteClient(
+                                            isBluetoothScoRequested(),
                                             "setBluetoothActiveDevice");
                                 }
                             }
@@ -1893,13 +1890,13 @@ public class AudioDeviceBroker {
                     break;
                 case MSG_L_BLUETOOTH_DEVICE_CONFIG_CHANGE: {
                     final BtDeviceInfo btInfo = (BtDeviceInfo) msg.obj;
-                    final Pair<Integer, Boolean> codecAndChanged = mBtHelper.getCodecWithFallback(
-                            btInfo.mDevice, btInfo.mProfile, btInfo.mIsLeOutput,
-                            "MSG_L_BLUETOOTH_DEVICE_CONFIG_CHANGE");
+                    @AudioSystem.AudioFormatNativeEnumForBtCodec final int codec =
+                            mBtHelper.getCodecWithFallback(btInfo.mDevice,
+                                    btInfo.mProfile, btInfo.mIsLeOutput,
+                                    "MSG_L_BLUETOOTH_DEVICE_CONFIG_CHANGE");
                     synchronized (mDeviceStateLock) {
-                        muteCheckDelayMs += mDeviceInventory.onBluetoothDeviceConfigChange(btInfo,
-                                codecAndChanged.first, codecAndChanged.second,
-                                BtHelper.EVENT_DEVICE_CONFIG_CHANGE);
+                        mDeviceInventory.onBluetoothDeviceConfigChange(
+                                btInfo, codec, BtHelper.EVENT_DEVICE_CONFIG_CHANGE);
                     }
                 } break;
                 case MSG_BROADCAST_AUDIO_BECOMING_NOISY:
