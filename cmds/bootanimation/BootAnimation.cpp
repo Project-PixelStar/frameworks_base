@@ -70,6 +70,7 @@ namespace android {
 using ui::DisplayMode;
 
 static const char OEM_BOOTANIMATION_FILE[] = "/oem/media/bootanimation.zip";
+static const char PRODUCT_BOOTANIMATION_MONET_FILE[] = "/product/media/bootanimation-monet.zip";
 static const char PRODUCT_BOOTANIMATION_DARK_FILE[] = "/product/media/bootanimation-dark.zip";
 static const char PRODUCT_BOOTANIMATION_FILE[] = "/product/media/bootanimation.zip";
 static const char SYSTEM_BOOTANIMATION_FILE[] = "/system/media/bootanimation.zip";
@@ -765,9 +766,10 @@ bool BootAnimation::findBootAnimationFileInternal(const std::vector<std::string>
 
 void BootAnimation::findBootAnimationFile() {
     ATRACE_CALL();
+    const bool playMonetAnim = android::base::GetIntProperty("persist.sys.boot.theme.monet", 0) == 1;
     const bool playDarkAnim = android::base::GetIntProperty("persist.sys.boot.theme", 0) == 1;
     static const std::vector<std::string> bootFiles = {
-        APEX_BOOTANIMATION_FILE, playDarkAnim ? PRODUCT_BOOTANIMATION_DARK_FILE : PRODUCT_BOOTANIMATION_FILE,
+        APEX_BOOTANIMATION_FILE, playMonetAnim ? PRODUCT_BOOTANIMATION_MONET_FILE : playDarkAnim ? PRODUCT_BOOTANIMATION_DARK_FILE : PRODUCT_BOOTANIMATION_FILE,
         OEM_BOOTANIMATION_FILE, SYSTEM_BOOTANIMATION_FILE
     };
     static const std::vector<std::string> shutdownFiles = {
