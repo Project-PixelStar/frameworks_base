@@ -410,18 +410,17 @@ public class AudioDeviceBroker {
             return;
         }
         if (!mScoManagedByAudio) {
-            boolean isBtScoRequested = isBluetoothScoRequested();
-            if (isBtScoRequested && (!wasBtScoRequested || !isBluetoothScoActive())) {
-                if (!mBtHelper.startBluetoothSco(scoAudioMode, eventSource)) {
-                    Log.w(TAG, "setCommunicationRouteForClient: failure to start BT SCO for uid: "
-                            + uid);
-                    // clean up or restore previous client selection
-                    if (prevClientDevice != null) {
-                        addCommunicationRouteClient(cb, uid, prevClientDevice, prevPrivileged);
-                    } else {
-                        removeCommunicationRouteClient(cb, true);
-                    }
-                    postBroadcastScoConnectionState(AudioManager.SCO_AUDIO_STATE_DISCONNECTED);
+        boolean isBtScoRequested = isBluetoothScoRequested();
+        if (isBtScoRequested && (!wasBtScoRequested || !isBluetoothScoActive()
+                || !mBtHelper.isBluetoothScoOn())) {
+            if (!mBtHelper.startBluetoothSco(scoAudioMode, eventSource)) {
+                Log.w(TAG, "setCommunicationRouteForClient: failure to start BT SCO for uid: "
+                        + uid);
+                // clean up or restore previous client selection
+                if (prevClientDevice != null) {
+                    addCommunicationRouteClient(cb, uid, prevClientDevice, prevPrivileged);
+                } else {
+                    removeCommunicationRouteClient(cb, true);
                 }
             } else if (!isBtScoRequested && wasBtScoRequested) {
                 mBtHelper.stopBluetoothSco(eventSource);
