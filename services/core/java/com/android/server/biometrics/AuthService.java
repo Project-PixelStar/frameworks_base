@@ -845,11 +845,29 @@ public class AuthService extends SystemService {
      */
     private static void registerFaceSensors(final String[] faceAidlInstances,
             final String[] hidlConfigStrings, final Context context,
-            final IFaceService faceService, final BiometricHandlerProvider handlerProvider) {
-        if ((hidlConfigStrings == null || hidlConfigStrings.length == 0)
-                && (faceAidlInstances == null || faceAidlInstances.length == 0)) {
-            Slog.d(TAG, "No face sensors.");
-            return;
+            final IFaceService faceService) {
+        boolean resetLockoutRequiresChallenge = false;
+
+        if (hidlConfigStrings != null && hidlConfigStrings.length > 0) {
+            for (String configString : hidlConfigStrings) {
+                try {
+                    SensorConfig sensor = new SensorConfig(configString);
+                    switch (sensor.modality) {
+                        case BiometricAuthenticator.TYPE_FACE:
+                            resetLockoutRequiresChallenge = true;
+                            break;
+                    }
+                } catch (Exception e) {
+                    Slog.e(TAG, "Error parsing configString: " + configString, e);
+                }
+            }
+        }
+
+        final FaceSensorConfigurations mFaceSensorConfigurations =
+                new FaceSensorConfigurations(resetLockoutRequiresChallenge);
+
+        if (hidlConfigStrings != null && hidlConfigStrings.length > 0) {
+            mFaceSensorConfigurations.addHidlConfigs(hidlConfigStrings, context);
         }
 
         handlerProvider.getFaceHandler().post(() -> {
