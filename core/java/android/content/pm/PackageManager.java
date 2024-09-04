@@ -8813,6 +8813,7 @@ public abstract class PackageManager {
 
         try {
             ParsedPackage pp = parser2.parsePackage(apkFile, parserFlags, false);
+            pp.hideAsFinal();
 
             return PackageInfoCommonUtils.generate(pp, flagsBits, UserHandle.myUserId());
         } catch (PackageParserException e) {
