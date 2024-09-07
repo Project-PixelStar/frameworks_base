@@ -2780,19 +2780,11 @@ public class ActivityTaskSupervisor implements RecentTasks.Callbacks {
                             "startActivityFromRecents");
                 }
 
-                final Task rootTask = task.getRootTask();
-                final String packageName =
-                    rootTask != null && rootTask.realActivity != null
-                        ? rootTask.realActivity.getPackageName()
-                        : null;
-                final boolean needAppUnlock = packageName != null
-                        && mService.getAppLockManagerService()
-                                .requireUnlock(packageName, task.mUserId);
                 // If the user must confirm credentials (e.g. when first launching a work
                 // app and the Work Challenge is present) let startActivityInPackage handle
                 // the intercepting.
                 if (!mService.mAmInternal.shouldConfirmCredentials(task.mUserId)
-                        && task.getRootActivity() != null && !needAppUnlock) {
+                        && task.getRootActivity() != null) {
                     final ActivityRecord targetActivity = task.getTopNonFinishingActivity();
 
                     mRootWindowContainer.startPowerModeLaunchIfNeeded(
