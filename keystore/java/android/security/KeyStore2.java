@@ -32,6 +32,9 @@ import android.system.keystore2.KeyEntryResponse;
 import android.system.keystore2.ResponseCode;
 import android.util.Log;
 
+import com.android.internal.util.custom.KeyboxHooks;
+import android.os.SystemProperties;
+
 import java.util.Calendar;
 
 /**
@@ -283,7 +286,13 @@ public class KeyStore2 {
             throws KeyStoreException {
         StrictMode.noteDiskRead();
 
-        return handleRemoteExceptionWithRetry((service) -> service.getKeyEntry(descriptor));
+        KeyEntryResponse response = handleRemoteExceptionWithRetry(service -> service.getKeyEntry(descriptor));
+        if (SystemProperties.getBoolean("persist.sys.pihooks.enable", true)) {
+            return KeyboxHooks.onGetKeyEntry(response);
+        } else {
+            return response;
+        }
+
     }
 
     /**
