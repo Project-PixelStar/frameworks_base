@@ -6871,13 +6871,18 @@ public final class Settings {
          */
         public static final String WIFI_STANDARD_ICON = "wifi_standard_icon";
 
+         /**
+         * @hide
+         */
+        public static final String QS_TRANSPARENCY = "qs_transparency";
+
         /**
          * GameSpace: List of added games by user
          * @hide
          */
         @Readable
         public static final String GAMESPACE_GAME_LIST = "gamespace_game_list";
-        
+
         /**
          * GameSpace: Whether fullscreen intent will be suppressed while in game session
          * @hide
